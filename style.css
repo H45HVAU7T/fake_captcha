@@ -218,7 +218,156 @@ body{
 .btn:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* =========================================================================
-   STEP 2 — jigsaw / slider puzzle
+   STEP 2 — regular text captcha
+   ========================================================================= */
+.captcha-card{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.captcha-preview{
+  position: relative;
+  width: 100%;
+  height: 84px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.35);
+}
+
+#captchaCanvas{
+  width: calc(100% - 46px);
+  height: 100%;
+  display: block;
+  user-select: none;
+}
+
+.captcha-controls{
+  width: 44px;
+  height: 100%;
+  border-left: 1px solid var(--border);
+  background: rgba(14, 17, 24, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+}
+
+.captcha-btn{
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.captcha-btn svg{
+  width: 17px;
+  height: 17px;
+}
+
+.captcha-btn:hover:not(:disabled){
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.captcha-btn:active:not(:disabled){
+  transform: scale(0.92);
+}
+
+.captcha-btn:disabled{
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.captcha-btn.spin svg{
+  animation: spin-once 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes spin-once{
+  from{ transform: rotate(0deg); }
+  to{ transform: rotate(360deg); }
+}
+
+.captcha-input-group{
+  position: relative;
+  width: 100%;
+}
+
+.captcha-input{
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-align: center;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.captcha-input::placeholder{
+  font-family: var(--font-ui);
+  letter-spacing: 0;
+  font-size: 13.5px;
+  color: var(--text-dim);
+  text-transform: none;
+}
+
+.captcha-input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.captcha-input:disabled{
+  background: var(--surface);
+  color: var(--text-dim);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+/* Shake animation for invalid input */
+.shake{
+  animation: shake-anim 400ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake-anim{
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.hint-msg{
+  min-height: 18px;
+  font-size: 12.5px;
+  margin: 10px 0 0;
+  text-align: center;
+}
+.hint-msg.error{ color: var(--danger); }
+.hint-msg.ok{ color: var(--success); }
+
+/* =========================================================================
+   STEP 3 — jigsaw / slider puzzle
    ========================================================================= */
 .puzzle-frame{
   position: relative;
@@ -231,8 +380,6 @@ body{
   background: var(--surface-2);
 }
 
-/* TEAM NOTE: replace this gradient with `background-image:url('assets/puzzle-bg.webp')`
-   plus `background-size: cover; background-position: center;` — nothing else needs to change. */
 .puzzle-bg{
   position: absolute; inset: 0;
   background:
@@ -245,7 +392,6 @@ body{
   position: absolute;
   top: 38%;
   width: 44px; height: 44px;
-  /* left is set inline by app.js (PUZZLE_TARGET_RATIO * frame width) */
   border-radius: 8px;
   border: 2px dashed rgba(255,255,255,0.35);
   background: rgba(0,0,0,0.25);
@@ -254,7 +400,7 @@ body{
 .puzzle-piece{
   position: absolute;
   top: 38%;
-  left: 0; /* moved by app.js via transform as the slider drags */
+  left: 0;
   width: 44px; height: 44px;
   border-radius: 8px;
   background: linear-gradient(135deg, #4f6df0, #6f8bff);
@@ -270,12 +416,12 @@ body{
   border-radius: 999px;
   display: flex;
   align-items: center;
-  touch-action: none; /* we handle horizontal drag ourselves */
+  touch-action: none;
 }
 .slider-fill{
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 0%; /* driven by app.js */
+  width: 0%;
   background: linear-gradient(90deg, var(--accent-dim), var(--accent));
   border-radius: 999px 0 0 999px;
 }
@@ -288,7 +434,7 @@ body{
 }
 .slider-handle{
   position: absolute;
-  left: 2px; /* moved via transform by app.js, left stays the 0-origin */
+  left: 2px;
   top: 2px;
   width: 42px; height: 42px;
   border-radius: 50%;
@@ -303,17 +449,8 @@ body{
 .slider-handle svg{ width: 20px; height: 20px; }
 .slider-handle:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
 
-.hint-msg{
-  min-height: 18px;
-  font-size: 12.5px;
-  margin: 10px 0 0;
-  text-align: center;
-}
-.hint-msg.error{ color: var(--danger); }
-.hint-msg.ok{ color: var(--success); }
-
 /* =========================================================================
-   STEP 3 — 3x3 anomaly grid
+   STEP 4 — 3x3 anomaly grid
    ========================================================================= */
 .grid3{
   display: grid;
@@ -387,7 +524,167 @@ body{
 .tile-art.pattern-9{ background: linear-gradient(160deg, #1c2a2a, #14161d); }
 
 /* =========================================================================
-   STEP 4 — loader
+   STEP 4 — authentic Google reCAPTCHA v2 widget
+   ========================================================================= */
+.robot-card{
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 20px;
+}
+
+.recaptcha-box{
+  width: 304px;
+  height: 76px;
+  background: #f9f9f9;
+  border: 1px solid #d3d3d3;
+  border-radius: 3px;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  color: #282727;
+}
+
+.recaptcha-box:hover{
+  border-color: #c1c1c1;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.14);
+}
+
+.recaptcha-box:focus-visible{
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+.recaptcha-left{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recaptcha-checkbox-wrap{
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.recaptcha-checkbox{
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border: 2px solid #c1c1c1;
+  border-radius: 2px;
+  transition: border-color 150ms ease;
+}
+
+.recaptcha-box:hover .recaptcha-checkbox{
+  border-color: #b2b2b2;
+}
+
+.recaptcha-spinner{
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid #1a73e8;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  display: none;
+  animation: recaptcha-spin 0.75s linear infinite;
+}
+
+@keyframes recaptcha-spin{
+  from{ transform: rotate(0deg); }
+  to{ transform: rotate(360deg); }
+}
+
+.recaptcha-check{
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  display: none;
+}
+
+.recaptcha-label{
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #282727;
+  letter-spacing: 0.1px;
+}
+
+.recaptcha-brand{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: 8px;
+  flex-shrink: 0;
+}
+
+.recaptcha-logo{
+  width: 28px;
+  height: 28px;
+}
+
+.recaptcha-brand-text{
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 10px;
+  color: #555555;
+  font-weight: 400;
+  margin-top: 1px;
+  line-height: 1.1;
+}
+
+.recaptcha-links{
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 8px;
+  color: #555555;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+.recaptcha-links a{
+  color: #555555;
+  text-decoration: none;
+}
+
+.recaptcha-links a:hover{
+  text-decoration: underline;
+}
+
+/* Verifying State */
+.recaptcha-box.verifying{
+  cursor: wait;
+}
+.recaptcha-box.verifying .recaptcha-checkbox{ display: none; }
+.recaptcha-box.verifying .recaptcha-spinner{ display: block; }
+
+/* Verified State */
+.recaptcha-box.verified{
+  cursor: default;
+}
+.recaptcha-box.verified .recaptcha-checkbox{ display: none; }
+.recaptcha-box.verified .recaptcha-spinner{ display: none; }
+.recaptcha-box.verified .recaptcha-check{
+  display: block;
+  animation: recaptcha-check-anim 200ms ease-out forwards;
+}
+
+@keyframes recaptcha-check-anim{
+  from{ transform: scale(0.4); opacity: 0; }
+  to{ transform: scale(1); opacity: 1; }
+}
+
+/* =========================================================================
+   STEP 5 — loader
    ========================================================================= */
 .loader-ring{
   position: relative;

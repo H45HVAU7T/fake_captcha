@@ -49,21 +49,49 @@
       <p class="fine-print">Protected by EdgeGate &middot; Session ID <span class="mono" id="sessionId">—</span></p>
     </section>
 
-    <!-- STEP 2 — slider / jigsaw puzzle ------------------------------------------ -->
+    <!-- STEP 2 — regular text captcha ------------------------------------------ -->
+    <section class="step" id="step-captcha" data-step="captcha" hidden>
+      <h2>Enter the security code</h2>
+      <p class="muted small">Type the characters displayed in the image below.</p>
+
+      <div class="captcha-card">
+        <div class="captcha-preview">
+          <canvas id="captchaCanvas" width="280" height="84" aria-label="Security verification code"></canvas>
+          <div class="captcha-controls">
+            <button type="button" class="captcha-btn" id="btnRefreshCaptcha" title="Get a new code" aria-label="Get a new code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/>
+              </svg>
+            </button>
+            <button type="button" class="captcha-btn" id="btnAudioCaptcha" title="Audio code" aria-label="Listen to audio code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="captcha-input-group">
+          <input type="text" id="captchaInput" class="captcha-input"
+                 placeholder="Enter characters" maxlength="6" autocomplete="off"
+                 autocorrect="off" autocapitalize="characters" spellcheck="false"
+                 aria-label="Security code input">
+        </div>
+      </div>
+
+      <button class="btn primary" id="btnVerifyCaptcha" disabled>Verify code</button>
+      <p class="hint-msg" id="captchaHint" aria-live="polite"></p>
+    </section>
+
+    <!-- STEP 3 — slider / jigsaw puzzle ------------------------------------------ -->
     <section class="step" id="step-slider" data-step="slider" hidden>
       <h2>Slide to align the fragment</h2>
       <p class="muted small">Drag the puzzle piece until it snaps into the notch.</p>
 
       <div class="puzzle-frame" id="puzzleFrame">
-        <!-- TEAM NOTE: swap this gradient div for a real <img src="assets/puzzle-bg.webp">.
-             The cutout/piece positions below are computed from puzzleFrame's rendered width in app.js,
-             so any background image will still line up correctly. -->
         <div class="puzzle-bg" id="puzzleBg"></div>
-
-        <!-- The notch is the empty socket the piece should end up over -->
         <div class="puzzle-notch" id="puzzleNotch" aria-hidden="true"></div>
-
-        <!-- The draggable puzzle piece (visually a "cut out" chunk of the bg) -->
         <div class="puzzle-piece" id="puzzlePiece" aria-hidden="true"></div>
       </div>
 
@@ -81,14 +109,11 @@
       <p class="hint-msg" id="sliderHint" aria-live="polite"></p>
     </section>
 
-    <!-- STEP 3 — grid anomaly selection ------------------------------------------ -->
+    <!-- STEP 4 — grid anomaly selection ------------------------------------------ -->
     <section class="step" id="step-grid" data-step="grid" hidden>
       <h2>Select all anomalies</h2>
       <p class="muted small">Tap every tile that shows a phishing red flag, then confirm.</p>
 
-      <!-- TEAM NOTE: each tile below is a placeholder gradient + label icon.
-           To use real imagery: replace .tile-art background with an <img> per tile
-           and set data-anomaly="true|false" on the ones that should count as correct. -->
       <div class="grid3" id="grid3">
         <!-- Tiles injected by app.js from TILE_DATA so labels/answers live in one place -->
       </div>
@@ -97,7 +122,41 @@
       <p class="hint-msg" id="gridHint" aria-live="polite"></p>
     </section>
 
-    <!-- STEP 4 — fake aggregation / progress loader ------------------------------ -->
+    <!-- STEP 5 — robot verification widget ------------------------------------ -->
+    <section class="step" id="step-robot" data-step="robot" hidden>
+      <h2>Confirm you are not a robot</h2>
+      <p class="muted small">Click the checkbox below to complete verification.</p>
+
+      <div class="robot-card" id="robotCard">
+        <div class="recaptcha-box" id="robotWidget" role="button" tabindex="0" aria-label="I'm not a robot">
+          <div class="recaptcha-left">
+            <div class="recaptcha-checkbox-wrap">
+              <div class="recaptcha-checkbox" id="robotCheckbox"></div>
+              <div class="recaptcha-spinner" id="robotSpinner" aria-hidden="true"></div>
+              <svg class="recaptcha-check" id="robotCheckIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M4.5 12.5L9.5 17.5L19.5 6.5" stroke="#00a65a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="recaptcha-label" id="robotLabel">I'm not a robot</span>
+          </div>
+          <div class="recaptcha-brand">
+            <svg class="recaptcha-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M16 4C9.37 4 4 9.37 4 16h3.5c0-4.69 3.81-8.5 8.5-8.5 2.66 0 5.04 1.23 6.6 3.16L19 14h9V5l-3.34 3.34C22.39 5.86 19.38 4 16 4z" fill="#1A73E8"/>
+              <path d="M16 28c6.63 0 12-5.37 12-12h-3.5c0 4.69-3.81 8.5-8.5 8.5-2.66 0-5.04-1.23-6.6-3.16L13 18H4v9l3.34-3.34C9.61 26.14 12.62 28 16 28z" fill="#9E9E9E"/>
+            </svg>
+            <span class="recaptcha-brand-text">reCAPTCHA</span>
+            <div class="recaptcha-links">
+              <a href="javascript:void(0)" tabindex="-1">Privacy</a> &middot; <a href="javascript:void(0)" tabindex="-1">Terms</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn primary" id="btnConfirmRobot" disabled>Continue</button>
+      <p class="hint-msg" id="robotHint" aria-live="polite"></p>
+    </section>
+
+    <!-- STEP 6 — fake aggregation / progress loader ------------------------------ -->
     <section class="step" id="step-loading" data-step="loading" hidden>
       <div class="loader-ring">
         <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -114,7 +173,7 @@
       </div>
     </section>
 
-    <!-- STEP 5 — success ---------------------------------------------------------- -->
+    <!-- STEP 7 — success ---------------------------------------------------------- -->
     <section class="step" id="step-success" data-step="success" hidden>
       <div class="success-icon">
         <svg viewBox="0 0 52 52" aria-hidden="true">
@@ -129,11 +188,13 @@
 
   </main>
 
-  <!-- Progress dots showing where we are in the 5-step flow -->
+  <!-- Progress dots showing where we are in the 7-step flow -->
   <div class="progress-dots" id="progressDots" aria-hidden="true">
     <span class="dot" data-dot="intro"></span>
+    <span class="dot" data-dot="captcha"></span>
     <span class="dot" data-dot="slider"></span>
     <span class="dot" data-dot="grid"></span>
+    <span class="dot" data-dot="robot"></span>
     <span class="dot" data-dot="loading"></span>
     <span class="dot" data-dot="success"></span>
   </div>
