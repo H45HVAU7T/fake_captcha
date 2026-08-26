@@ -45,18 +45,35 @@
   ];
 
   // Grid tile copy for Step 3. `anomaly:true` tiles are the "correct" picks.
-  // TEAM NOTE: swap `pattern` for a real image class/URL per tile when art is ready.
+  // Each tile renders a visible icon + caption (not just an aria-label) so
+  // people can actually tell tiles apart and judge which are red flags.
+  // TEAM NOTE: swap `pattern` for a real image class/URL per tile when art is ready;
+  // the icon/caption can stay as an overlay on top of a real screenshot if you want.
   const TILE_DATA = [
-    { label: "Urgent password reset", anomaly: true,  pattern: "pattern-1" },
-    { label: "Company logo",           anomaly: false, pattern: "pattern-2" },
-    { label: "Mismatched sender domain", anomaly: true, pattern: "pattern-3" },
-    { label: "Calendar invite",        anomaly: false, pattern: "pattern-4" },
-    { label: "Suspicious shortened link", anomaly: true, pattern: "pattern-5" },
-    { label: "Team meeting note",      anomaly: false, pattern: "pattern-6" },
-    { label: "Generic greeting + threat", anomaly: true, pattern: "pattern-7" },
-    { label: "Normal newsletter",      anomaly: false, pattern: "pattern-8" },
-    { label: "Spoofed login page",     anomaly: true,  pattern: "pattern-9" },
+    { label: "Urgent: reset your password now", anomaly: true,  pattern: "pattern-1", icon: "alert" },
+    { label: "Company logo",                     anomaly: false, pattern: "pattern-2", icon: "brand" },
+    { label: "Sender: support@paypaI.com",       anomaly: true,  pattern: "pattern-3", icon: "at" },
+    { label: "Calendar invite",                  anomaly: false, pattern: "pattern-4", icon: "calendar" },
+    { label: "bit.ly/3xK9z2 — click now",        anomaly: true,  pattern: "pattern-5", icon: "link" },
+    { label: "Team meeting note",                anomaly: false, pattern: "pattern-6", icon: "note" },
+    { label: "\"Dear user\" + account will close", anomaly: true, pattern: "pattern-7", icon: "warning" },
+    { label: "Monthly newsletter",               anomaly: false, pattern: "pattern-8", icon: "mail" },
+    { label: "Login page asking for full SSN",   anomaly: true,  pattern: "pattern-9", icon: "shield-x" },
   ];
+
+  // Minimal inline icon set (no external assets, keeps bundle tiny).
+  // Each returns an SVG string sized by the .tile-icon wrapper in CSS.
+  const ICONS = {
+    alert: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
+    brand: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+    at: '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-4 7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    link: '<path d="M9 15l6-6M8 16l-2 2a3.5 3.5 0 01-5-5l3-3a3.5 3.5 0 015 0M16 8l2-2a3.5 3.5 0 015 5l-3 3a3.5 3.5 0 01-5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    note: '<rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    warning: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 6.5l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    "shield-x": '<path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  };
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];
 
@@ -344,7 +361,10 @@
       btn.setAttribute("aria-pressed", "false");
       btn.setAttribute("aria-label", tile.label);
       btn.innerHTML = `
-        <span class="tile-art ${tile.pattern}"></span>
+        <span class="tile-art ${tile.pattern}">
+          <svg class="tile-icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[tile.icon] || ""}</svg>
+        </span>
+        <span class="tile-caption">${tile.label}</span>
         <span class="tile-check">&#10003;</span>
       `;
       btn.addEventListener("click", () => toggleTile(i, btn));
