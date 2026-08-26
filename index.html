@@ -22,6 +22,9 @@
             stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
+      <div class="brand-text">
+        <span class="brand-name">EdgeGate</span>
+        <span class="brand-sub" id="statusLine">Attestation service</span>
       </div>
     </header>
 
@@ -96,92 +99,88 @@
           <p class="rc-header-sub">Click verify once you have selected all threats.</p>
         </div>
 
-    <!-- STEP 4 — grid anomaly selection ------------------------------------------ -->
-    <section class="step" id="step-grid" data-step="grid" hidden>
-      <h2>Select all anomalies</h2>
-      <p class="muted small">Tap every tile that shows a phishing red flag, then confirm.</p>
+        <div class="rc-body">
+          <div class="grid3" id="grid3">
+            <!-- Tiles injected dynamically by app.js -->
+          </div>
+        </div>
 
-      <div class="grid3" id="grid3">
-        <!-- Tiles injected by app.js from TILE_DATA so labels/answers live in one place -->
-      </div>
+        <p class="hint-msg" id="gridHint" aria-live="polite" style="margin: 4px 14px 2px;"></p>
+
+        <div class="rc-footer">
+          <div class="rc-controls">
+            <!-- Reload icon -->
+            <button class="rc-icon-btn" type="button" id="btnReloadGrid" aria-label="Get a new challenge">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+              </svg>
+            </button>
+            <!-- Audio challenge icon -->
+            <button class="rc-icon-btn" type="button" aria-label="Audio challenge">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </button>
+            <!-- Info icon -->
+            <button class="rc-icon-btn" type="button" aria-label="Help and Info">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+            </button>
+          </div>
+
+          <button class="rc-button" id="btnConfirmGrid" disabled>Verify</button>
+        </div>
+      </section>
+
+      <!-- STEP 4 — Fake aggregation / progress loader -->
+      <section class="step" id="step-loading" data-step="loading" hidden>
+        <div class="step-loader-inner">
+          <div class="loader-ring">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+              <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="44"></circle>
+            </svg>
+            <span class="ring-pct" id="ringPct">0%</span>
+          </div>
+          <h2 class="loader-title">Finalizing Room Quorum</h2>
+          <p class="loader-sub" id="loaderStatus">Initializing…</p>
+
+          <div class="log-console" id="logConsole" aria-live="polite">
+            <!-- Live fake telemetry injected here by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 5 — Success Screen -->
+      <section class="step" id="step-success" data-step="success" hidden>
+        <div class="step-success-inner">
+          <div class="success-icon">
+            <svg viewBox="0 0 52 52" aria-hidden="true">
+              <circle class="success-circle" cx="26" cy="26" r="24" fill="none" />
+              <path class="success-check" fill="none" d="M14 27l7 7 17-17" />
+            </svg>
+          </div>
+          <h1 class="success-title">Access Authorized</h1>
+          <p class="success-desc">Direct your attention to the main auditorium stage screen.</p>
+          <p class="fine-print">Verified in <span class="mono" id="verifyTime">—</span> &middot; Session Token <span
+              class="mono" id="tokenId">—</span></p>
+        </div>
+      </section>
 
     </main>
 
-    <!-- STEP 5 — robot verification widget ------------------------------------ -->
-    <section class="step" id="step-robot" data-step="robot" hidden>
-      <h2>Confirm you are not a robot</h2>
-      <p class="muted small">Click the checkbox below to complete verification.</p>
+    <!-- Progress dots showing step sequence -->
+    <div class="progress-dots" id="progressDots" aria-hidden="true">
+      <span class="dot" data-dot="intro"></span>
+      <span class="dot" data-dot="slider"></span>
+      <span class="dot" data-dot="grid"></span>
+      <span class="dot" data-dot="loading"></span>
+      <span class="dot" data-dot="success"></span>
+    </div>
 
-      <div class="robot-card" id="robotCard">
-        <div class="recaptcha-box" id="robotWidget" role="button" tabindex="0" aria-label="I'm not a robot">
-          <div class="recaptcha-left">
-            <div class="recaptcha-checkbox-wrap">
-              <div class="recaptcha-checkbox" id="robotCheckbox"></div>
-              <div class="recaptcha-spinner" id="robotSpinner" aria-hidden="true"></div>
-              <svg class="recaptcha-check" id="robotCheckIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M4.5 12.5L9.5 17.5L19.5 6.5" stroke="#00a65a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <span class="recaptcha-label" id="robotLabel">I'm not a robot</span>
-          </div>
-          <div class="recaptcha-brand">
-            <svg class="recaptcha-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M16 4C9.37 4 4 9.37 4 16h3.5c0-4.69 3.81-8.5 8.5-8.5 2.66 0 5.04 1.23 6.6 3.16L19 14h9V5l-3.34 3.34C22.39 5.86 19.38 4 16 4z" fill="#1A73E8"/>
-              <path d="M16 28c6.63 0 12-5.37 12-12h-3.5c0 4.69-3.81 8.5-8.5 8.5-2.66 0-5.04-1.23-6.6-3.16L13 18H4v9l3.34-3.34C9.61 26.14 12.62 28 16 28z" fill="#9E9E9E"/>
-            </svg>
-            <span class="recaptcha-brand-text">reCAPTCHA</span>
-            <div class="recaptcha-links">
-              <a href="javascript:void(0)" tabindex="-1">Privacy</a> &middot; <a href="javascript:void(0)" tabindex="-1">Terms</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn primary" id="btnConfirmRobot" disabled>Continue</button>
-      <p class="hint-msg" id="robotHint" aria-live="polite"></p>
-    </section>
-
-    <!-- STEP 6 — fake aggregation / progress loader ------------------------------ -->
-    <section class="step" id="step-loading" data-step="loading" hidden>
-      <div class="loader-ring">
-        <svg viewBox="0 0 100 100" aria-hidden="true">
-          <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
-          <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="44"></circle>
-        </svg>
-        <span class="ring-pct" id="ringPct">0%</span>
-      </div>
-      <h2>Finalizing room quorum</h2>
-      <p class="muted small" id="loaderStatus">Initializing…</p>
-
-      <div class="log-console" id="logConsole" aria-live="polite">
-        <!-- Fake telemetry lines are appended here by app.js -->
-      </div>
-    </section>
-
-    <!-- STEP 7 — success ---------------------------------------------------------- -->
-    <section class="step" id="step-success" data-step="success" hidden>
-      <div class="success-icon">
-        <svg viewBox="0 0 52 52" aria-hidden="true">
-          <circle class="success-circle" cx="26" cy="26" r="24" fill="none"/>
-          <path class="success-check" fill="none" d="M14 27l7 7 17-17"/>
-        </svg>
-      </div>
-      <h1>Access authorized</h1>
-      <p class="muted">Direct your attention to the main stage screen.</p>
-      <p class="fine-print">Verified in <span class="mono" id="verifyTime">—</span> &middot; Token <span class="mono" id="tokenId">—</span></p>
-    </section>
-
-  </main>
-
-  <!-- Progress dots showing where we are in the 7-step flow -->
-  <div class="progress-dots" id="progressDots" aria-hidden="true">
-    <span class="dot" data-dot="intro"></span>
-    <span class="dot" data-dot="captcha"></span>
-    <span class="dot" data-dot="slider"></span>
-    <span class="dot" data-dot="grid"></span>
-    <span class="dot" data-dot="robot"></span>
-    <span class="dot" data-dot="loading"></span>
-    <span class="dot" data-dot="success"></span>
   </div>
 
   <script src="app.js"></script>
