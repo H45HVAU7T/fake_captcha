@@ -18,7 +18,7 @@
     PUZZLE_TOLERANCE_PX: 14,     // how close the piece must land to the notch to "snap"
     PUZZLE_PIECE_SIZE: 44,       // must match .puzzle-piece / .puzzle-notch width in CSS
 
-    // Step 3 grid puzzle — minimum correct anomaly tiles the user must pick
+    // Step 3 grid puzzle — minimum correct bicycle tiles the user must pick
     GRID_REQUIRED_CORRECT: 3,
 
     // Step 4 fake loader
@@ -31,44 +31,42 @@
     STORAGE_KEY: "edgegate_verify_progress_v1",
   };
 
-  // Fake telemetry copy shown in the step-4 console.
+  // Telemetry copy shown in the step-4 console.
   const LOG_LINES = [
-    "Requesting attestation token…",
-    "Session fingerprint matched",
-    "Synchronizing key fragments…",
-    "Verifying room quorum (1/3)",
-    "Verifying room quorum (2/3)",
-    "Verifying room quorum (3/3)",
-    "Cross-checking device signal",
-    "Aggregating peer confirmations…",
-    "Establishing secure channel",
-    "Provisioning stage access token",
+    "Connecting to event session…",
+    "Session fingerprint confirmed",
+    "Synchronizing attendee key…",
+    "Verifying room check-in (1/3)",
+    "Verifying room check-in (2/3)",
+    "Verifying room check-in (3/3)",
+    "Confirming auditorium attendance",
+    "Aggregating peer tokens…",
+    "Establishing verified channel",
+    "Provisioning stage access pass",
   ];
 
-  // Grid tile copy for Step 3. `anomaly:true` tiles are the "correct" picks (threats/red flags).
+  // Grid tile copy for Step 3: standard everyday object identification (bicycles)
+  // No cybersecurity or technical knowledge needed!
   const TILE_DATA = [
-    { label: "Urgent: Reset password now", anomaly: true, pattern: "pattern-1", icon: "alert" },
-    { label: "Official company logo", anomaly: false, pattern: "pattern-2", icon: "brand" },
-    { label: "From: support@paypaI.com", anomaly: true, pattern: "pattern-3", icon: "at" },
-    { label: "Team calendar invite", anomaly: false, pattern: "pattern-4", icon: "calendar" },
-    { label: "bit.ly/3xK9z2 — click now", anomaly: true, pattern: "pattern-5", icon: "link" },
-    { label: "Conference meeting note", anomaly: false, pattern: "pattern-6", icon: "note" },
-    { label: "Suspicious invoice .exe", anomaly: true, pattern: "pattern-7", icon: "warning" },
-    { label: "Monthly team newsletter", anomaly: false, pattern: "pattern-8", icon: "mail" },
-    { label: "Form asking for full SSN", anomaly: true, pattern: "pattern-9", icon: "shield-x" },
+    { label: "Road Bicycle",       isTarget: true,  pattern: "pattern-1", icon: "bike" },
+    { label: "Sedan Car",          isTarget: false, pattern: "pattern-2", icon: "car" },
+    { label: "Mountain Bicycle",   isTarget: true,  pattern: "pattern-3", icon: "bike" },
+    { label: "Traffic Signal",     isTarget: false, pattern: "pattern-4", icon: "traffic" },
+    { label: "City Bicycle",       isTarget: true,  pattern: "pattern-5", icon: "bike" },
+    { label: "City Bus",           isTarget: false, pattern: "pattern-6", icon: "bus" },
+    { label: "Fire Hydrant",       isTarget: false, pattern: "pattern-7", icon: "hydrant" },
+    { label: "Motorcycle",         isTarget: false, pattern: "pattern-8", icon: "motorcycle" },
+    { label: "Vintage Bicycle",    isTarget: true,  pattern: "pattern-9", icon: "bike" },
   ];
 
-  // Minimal inline icon set
+  // Minimal inline icon set for everyday objects
   const ICONS = {
-    alert: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="currentColor"/>',
-    brand: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/>',
-    at: '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-4 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    calendar: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    link: '<path d="M9 15l6-6M8 16l-2 2a3.5 3.5 0 01-5-5l3-3a3.5 3.5 0 015 0M16 8l2-2a3.5 3.5 0 015 5l-3 3a3.5 3.5 0 01-5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    note: '<rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    warning: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="currentColor"/>',
-    mail: '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 6.5l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-    "shield-x": '<path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    bike: '<circle cx="5.5" cy="17.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18.5" cy="17.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 17.5l4-7h5l4 7M14.5 10.5l-4 7m4-7l-1.5-4h-3M10 7h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    car: '<path d="M3 14l2-5h14l2 5v4h-2v-1H5v1H3v-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.8" fill="currentColor"/><circle cx="17" cy="15.5" r="1.8" fill="currentColor"/><path d="M5 9l1.5-4h11L19 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+    traffic: '<rect x="8" y="2" width="8" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="6" r="1.6" fill="currentColor"/><circle cx="12" cy="11" r="1.6" fill="currentColor"/><circle cx="12" cy="16" r="1.6" fill="currentColor"/><path d="M12 20v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    bus: '<rect x="4" y="3" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="15" r="1.5" fill="currentColor"/><circle cx="16" cy="15" r="1.5" fill="currentColor"/><path d="M6 18v3M18 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    hydrant: '<path d="M8 8a4 4 0 0 1 8 0v11H8V8zM5 11h3m8 0h3M7 21h10M10 4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="1.8" fill="currentColor"/>',
+    motorcycle: '<circle cx="5" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="19" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 16l4-5h4l3 5M12 8h3l2 3M8 11h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
   };
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];
@@ -151,7 +149,7 @@
   function saveProgress() {
     try {
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({ step: state.step }));
-    } catch (e) { }
+    } catch (e) {}
   }
 
   function loadProgress() {
@@ -160,12 +158,12 @@
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (STEPS.includes(parsed.step)) return parsed.step;
-    } catch (e) { }
+    } catch (e) {}
     return null;
   }
 
   function clearProgress() {
-    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch (e) { }
+    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch (e) {}
   }
 
   /* ---------------------------------------------------------------------
@@ -198,9 +196,9 @@
 
     const statusByStep = {
       intro: "Attestation service",
-      slider: "Align fragment",
-      grid: "Threat analysis",
-      loading: "Aggregating signals…",
+      slider: "Align puzzle fragment",
+      grid: "Object verification",
+      loading: "Confirming check-in…",
       success: "Verified",
     };
     if (el.statusLine) {
@@ -367,7 +365,7 @@
   }
 
   /* =======================================================================
-     STEP 3 — 3x3 Grid Challenge
+     STEP 3 — 3x3 Grid Challenge (Everyday Objects / Bicycles)
      ======================================================================= */
   function renderGridTiles() {
     if (!el.grid3) return;
@@ -435,27 +433,27 @@
   }
 
   function confirmGrid() {
-    const correctCount = session.tiles.filter((t, i) => t.anomaly && state.gridSelected.has(i)).length;
-    const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].anomaly).length;
+    const correctCount = session.tiles.filter((t, i) => t.isTarget && state.gridSelected.has(i)).length;
+    const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].isTarget).length;
 
-    // Passing condition: at least 3 correct threats picked and zero false positives
+    // Passing condition: at least 3 bicycles selected and zero wrong selections
     if (correctCount >= CONFIG.GRID_REQUIRED_CORRECT && wrongCount === 0) {
       if (el.gridHint) {
-        el.gridHint.textContent = "Threat verification confirmed ✓";
+        el.gridHint.textContent = "Verification confirmed ✓";
         el.gridHint.className = "hint-msg ok";
       }
       if (el.btnConfirmGrid) el.btnConfirmGrid.disabled = true;
       setTimeout(() => goTo("loading"), 500);
     } else {
       if (el.gridHint) {
-        el.gridHint.textContent = "Please select all phishing red flags and retry.";
+        el.gridHint.textContent = "Please select all squares with bicycles and retry.";
         el.gridHint.className = "hint-msg error";
       }
     }
   }
 
   /* =======================================================================
-     STEP 4 — Telemetry Progress Loader
+     STEP 4 — Verification Progress Loader
      ======================================================================= */
   const RING_CIRCUMFERENCE = 2 * Math.PI * 44;
 
@@ -495,7 +493,7 @@
 
       if (pct >= target) {
         clearInterval(tick);
-        if (el.loaderStatus) el.loaderStatus.textContent = "Quorum reached";
+        if (el.loaderStatus) el.loaderStatus.textContent = "Check-in verified";
         setTimeout(() => {
           setRingProgress(100);
           appendLogLine("Verification complete", true);
@@ -513,7 +511,7 @@
       logIndex += 1;
       if (el.loaderStatus) {
         if (logIndex <= 3) el.loaderStatus.textContent = LOG_LINES[logIndex - 1];
-        else el.loaderStatus.textContent = "Synchronizing key fragments…";
+        else el.loaderStatus.textContent = "Synchronizing attendee access…";
       }
     }, CONFIG.LOADER_LOG_INTERVAL_MS);
   }
