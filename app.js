@@ -11,11 +11,9 @@
      CONFIG — tweak these to retune puzzle difficulty / timings
      --------------------------------------------------------------------- */
   const CONFIG = {
-    // Step 3 slider/jigsaw — notch position is randomized per page load between
-    // these two ratios (see session.puzzleTargetRatio in boot())
     PUZZLE_TARGET_MIN: 0.30,
     PUZZLE_TARGET_MAX: 0.82,
-    PUZZLE_TOLERANCE_PX: 10,     // how close the piece must land to the notch to "snap"
+    PUZZLE_TOLERANCE_PX: 14,     // how close the piece must land to the notch to "snap"
     PUZZLE_PIECE_SIZE: 44,       // must match .puzzle-piece / .puzzle-notch width in CSS
 
     // Step 4 grid puzzle — minimum correct anomaly tiles the user must pick
@@ -47,28 +45,28 @@
 
   // Grid tile copy for Step 4. `anomaly:true` tiles are the "correct" picks.
   const TILE_DATA = [
-    { label: "Urgent: reset your password now", anomaly: true,  pattern: "pattern-1", icon: "alert" },
-    { label: "Company logo",                     anomaly: false, pattern: "pattern-2", icon: "brand" },
-    { label: "Sender: support@paypaI.com",       anomaly: true,  pattern: "pattern-3", icon: "at" },
-    { label: "Calendar invite",                  anomaly: false, pattern: "pattern-4", icon: "calendar" },
-    { label: "bit.ly/3xK9z2 — click now",        anomaly: true,  pattern: "pattern-5", icon: "link" },
-    { label: "Team meeting note",                anomaly: false, pattern: "pattern-6", icon: "note" },
-    { label: "\"Dear user\" + account will close", anomaly: true, pattern: "pattern-7", icon: "warning" },
-    { label: "Monthly newsletter",               anomaly: false, pattern: "pattern-8", icon: "mail" },
-    { label: "Login page asking for full SSN",   anomaly: true,  pattern: "pattern-9", icon: "shield-x" },
+    { label: "Urgent: Reset password now",   anomaly: true,  pattern: "pattern-1", icon: "alert" },
+    { label: "Official company logo",        anomaly: false, pattern: "pattern-2", icon: "brand" },
+    { label: "From: support@paypaI.com",     anomaly: true,  pattern: "pattern-3", icon: "at" },
+    { label: "Team calendar invite",         anomaly: false, pattern: "pattern-4", icon: "calendar" },
+    { label: "bit.ly/3xK9z2 — click now",    anomaly: true,  pattern: "pattern-5", icon: "link" },
+    { label: "Conference meeting note",      anomaly: false, pattern: "pattern-6", icon: "note" },
+    { label: "Suspicious invoice .exe",      anomaly: true,  pattern: "pattern-7", icon: "warning" },
+    { label: "Monthly team newsletter",      anomaly: false, pattern: "pattern-8", icon: "mail" },
+    { label: "Form asking for full SSN",     anomaly: true,  pattern: "pattern-9", icon: "shield-x" },
   ];
 
   // Minimal inline icon set
   const ICONS = {
-    alert: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
-    brand: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
-    at: '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-4 7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-    calendar: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-    link: '<path d="M9 15l6-6M8 16l-2 2a3.5 3.5 0 01-5-5l3-3a3.5 3.5 0 015 0M16 8l2-2a3.5 3.5 0 015 5l-3 3a3.5 3.5 0 01-5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-    note: '<rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-    warning: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
-    mail: '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 6.5l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
-    "shield-x": '<path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    alert: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="currentColor"/>',
+    brand: '<rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/>',
+    at: '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-4 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    link: '<path d="M9 15l6-6M8 16l-2 2a3.5 3.5 0 01-5-5l3-3a3.5 3.5 0 015 0M16 8l2-2a3.5 3.5 0 015 5l-3 3a3.5 3.5 0 01-5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    note: '<rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    warning: '<path d="M12 3L2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="currentColor"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 6.5l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    "shield-x": '<path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   };
 
   const STEPS = ["intro", "captcha", "slider", "grid", "robot", "loading", "success"];
@@ -188,7 +186,7 @@
   }
 
   function clearProgress() {
-    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch (e) { /* ignore */ }
+    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch (e) {}
   }
 
   /* ---------------------------------------------------------------------
@@ -213,13 +211,15 @@
       if (section) section.hidden = name !== state.step;
     });
 
-    el.dots.forEach((dot) => {
-      const name = dot.dataset.dot;
-      const idx = STEPS.indexOf(name);
-      const curIdx = STEPS.indexOf(state.step);
-      dot.classList.toggle("active", name === state.step);
-      dot.classList.toggle("done", idx < curIdx);
-    });
+    if (el.dots) {
+      el.dots.forEach((dot) => {
+        const name = dot.dataset.dot;
+        const idx = STEPS.indexOf(name);
+        const curIdx = STEPS.indexOf(state.step);
+        dot.classList.toggle("active", name === state.step);
+        dot.classList.toggle("done", idx < curIdx);
+      });
+    }
 
     const statusByStep = {
       intro: "Attestation service",
@@ -230,18 +230,23 @@
       loading: "Aggregating signals…",
       success: "Verified",
     };
-    el.statusLine.textContent = statusByStep[state.step];
+    if (el.statusLine) {
+      el.statusLine.textContent = statusByStep[state.step] || "Security Check";
+    }
   }
 
   /* =======================================================================
-     STEP 1 — intro
+     STEP 1 — Checkbox Intro
      ======================================================================= */
   function initStep1() {
-    el.sessionId.textContent = randHex(8);
+    if (!el.humanCheck) return;
 
     el.humanCheck.addEventListener("change", () => {
-      el.btnStartVerify.disabled = !el.humanCheck.checked;
-    });
+      if (el.humanCheck.checked) {
+        state.startTime = performance.now();
+
+        // Show realistic spinner inside checkbox
+        if (el.rcCheckboxVisual) el.rcCheckboxVisual.classList.add("loading");
 
     el.btnStartVerify.addEventListener("click", () => {
       state.startTime = performance.now();
@@ -489,22 +494,21 @@
       frameWidth = el.puzzleFrame.clientWidth;
 
       const notchLeft = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
-      el.puzzleNotch.style.left = `${notchLeft}px`;
+      if (el.puzzleNotch) el.puzzleNotch.style.left = `${Math.max(0, notchLeft)}px`;
     }
 
     function setFraction(fraction) {
       fraction = clamp(fraction, 0, 1);
       const handleX = fraction * maxHandleTravel;
       el.sliderHandle.style.transform = `translateX(${handleX}px)`;
-      el.sliderFill.style.width = `${(handleX + handleWidth / 2) / trackWidth * 100}%`;
+      if (el.sliderFill) el.sliderFill.style.width = `${(handleX + handleWidth / 2) / trackWidth * 100}%`;
       el.sliderHandle.setAttribute("aria-valuenow", Math.round(fraction * 100));
 
       const pieceMaxTravel = frameWidth - CONFIG.PUZZLE_PIECE_SIZE;
       const pieceX = fraction * pieceMaxTravel;
-      el.puzzlePiece.style.transform = `translateX(${pieceX}px)`;
+      if (el.puzzlePiece) el.puzzlePiece.style.transform = `translateX(${pieceX}px)`;
 
-      el.sliderLabel.style.opacity = fraction > 0.08 ? "0" : "1";
-
+      if (el.sliderLabel) el.sliderLabel.style.opacity = fraction > 0.08 ? "0" : "1";
       return pieceX;
     }
 
@@ -525,17 +529,21 @@
     function solveSlider() {
       if (state.sliderSolved) return;
       state.sliderSolved = true;
-      el.sliderHint.textContent = "Fragment aligned";
-      el.sliderHint.className = "hint-msg ok";
-      el.puzzlePiece.style.boxShadow = "0 0 0 2px var(--success), 0 6px 16px -4px rgba(0,0,0,0.5)";
+      if (el.sliderHint) {
+        el.sliderHint.textContent = "✓ Puzzle aligned successfully";
+        el.sliderHint.className = "hint-msg ok";
+      }
+      if (el.puzzlePiece) {
+        el.puzzlePiece.style.boxShadow = "0 0 0 2px var(--rc-success), 0 6px 16px -4px rgba(0,0,0,0.5)";
+      }
       el.sliderHandle.setAttribute("aria-disabled", "true");
-      setTimeout(() => goTo("grid"), 550);
+      setTimeout(() => goTo("grid"), 600);
     }
 
     function onPointerMove(clientX) {
       const trackRect = el.sliderTrack.getBoundingClientRect();
       const fraction = (clientX - trackRect.left - handleWidth / 2) / maxHandleTravel;
-      const pieceX = setFraction(fraction);
+      setFraction(fraction);
       return { fraction: clamp(fraction, 0, 1) };
     }
 
@@ -546,8 +554,10 @@
       const snapped = checkSnap(fraction);
       if (!snapped) {
         setFraction(0);
-        el.sliderHint.textContent = "Not quite — try again";
-        el.sliderHint.className = "hint-msg error";
+        if (el.sliderHint) {
+          el.sliderHint.textContent = "Not quite aligned — try again";
+          el.sliderHint.className = "hint-msg error";
+        }
       }
     }
 
@@ -580,8 +590,8 @@
       measure();
       const current = Number(el.sliderHandle.getAttribute("aria-valuenow")) / 100;
       let next = current;
-      if (e.key === "ArrowRight") next = current + 0.04;
-      else if (e.key === "ArrowLeft") next = current - 0.04;
+      if (e.key === "ArrowRight") next = current + 0.05;
+      else if (e.key === "ArrowLeft") next = current - 0.05;
       else return;
       e.preventDefault();
       setFraction(next);
@@ -617,15 +627,34 @@
       btn.innerHTML = `
         <span class="tile-art ${tile.pattern}">
           <svg class="tile-icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[tile.icon] || ""}</svg>
+          <span class="tile-caption">${tile.label}</span>
         </span>
-        <span class="tile-caption">${tile.label}</span>
-        <span class="tile-check">&#10003;</span>
+        <span class="tile-check">✓</span>
       `;
       btn.addEventListener("click", () => toggleTile(i, btn));
       el.grid3.appendChild(btn);
     });
 
-    el.btnConfirmGrid.addEventListener("click", confirmGrid);
+    if (el.btnConfirmGrid) el.btnConfirmGrid.disabled = true;
+    if (el.gridHint) {
+      el.gridHint.textContent = "";
+      el.gridHint.className = "hint-msg";
+    }
+  }
+
+  function initStep3() {
+    renderGridTiles();
+
+    if (el.btnConfirmGrid) {
+      el.btnConfirmGrid.addEventListener("click", confirmGrid);
+    }
+
+    if (el.btnReloadGrid) {
+      el.btnReloadGrid.addEventListener("click", () => {
+        session.tiles = shuffleArray(TILE_DATA);
+        renderGridTiles();
+      });
+    }
   }
 
   function toggleTile(index, btn) {
@@ -638,23 +667,31 @@
       btn.classList.add("selected");
       btn.setAttribute("aria-pressed", "true");
     }
-    el.btnConfirmGrid.disabled = state.gridSelected.size === 0;
-    el.gridHint.textContent = "";
-    el.gridHint.className = "hint-msg";
+
+    if (el.btnConfirmGrid) {
+      el.btnConfirmGrid.disabled = state.gridSelected.size === 0;
+    }
+    if (el.gridHint) {
+      el.gridHint.textContent = "";
+      el.gridHint.className = "hint-msg";
+    }
   }
 
   function confirmGrid() {
     const correctCount = session.tiles.filter((t, i) => t.anomaly && state.gridSelected.has(i)).length;
     const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].anomaly).length;
 
+    // Passing condition: at least 3 correct threats picked and zero false positives
     if (correctCount >= CONFIG.GRID_REQUIRED_CORRECT && wrongCount === 0) {
       el.gridHint.textContent = "Selection confirmed";
       el.gridHint.className = "hint-msg ok";
       el.btnConfirmGrid.disabled = true;
       setTimeout(() => goTo("robot"), 450);
     } else {
-      el.gridHint.textContent = "That's not quite right — check again";
-      el.gridHint.className = "hint-msg error";
+      if (el.gridHint) {
+        el.gridHint.textContent = "Please select all phishing red flags and retry.";
+        el.gridHint.className = "hint-msg error";
+      }
     }
   }
 
@@ -705,15 +742,17 @@
   /* =======================================================================
      STEP 6 — fake progress loader
      ======================================================================= */
-  const RING_CIRCUMFERENCE = 2 * Math.PI * 44; // matches r=44 in the SVG
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 44;
 
   function setRingProgress(pct) {
+    if (!el.ringFg || !el.ringPct) return;
     const offset = RING_CIRCUMFERENCE * (1 - pct / 100);
     el.ringFg.style.strokeDashoffset = String(offset);
     el.ringPct.textContent = `${Math.round(pct)}%`;
   }
 
   function appendLogLine(text, isOk) {
+    if (!el.logConsole) return;
     const line = document.createElement("div");
     line.className = "log-line";
     line.innerHTML = isOk ? `<span class="ok">✓</span> ${text}` : text;
@@ -726,7 +765,7 @@
   function runLoader() {
     el.logConsole.innerHTML = "";
     setRingProgress(0);
-    el.loaderStatus.textContent = "Initializing…";
+    if (el.loaderStatus) el.loaderStatus.textContent = "Initializing…";
 
     let pct = 0;
     let logIndex = 0;
@@ -740,7 +779,7 @@
 
       if (pct >= target) {
         clearInterval(tick);
-        el.loaderStatus.textContent = "Quorum reached";
+        if (el.loaderStatus) el.loaderStatus.textContent = "Quorum reached";
         setTimeout(() => {
           setRingProgress(100);
           appendLogLine("Verification complete", true);
@@ -756,8 +795,10 @@
       }
       appendLogLine(LOG_LINES[logIndex]);
       logIndex += 1;
-      if (logIndex <= 3) el.loaderStatus.textContent = LOG_LINES[logIndex - 1];
-      else el.loaderStatus.textContent = "Synchronizing key fragments…";
+      if (el.loaderStatus) {
+        if (logIndex <= 3) el.loaderStatus.textContent = LOG_LINES[logIndex - 1];
+        else el.loaderStatus.textContent = "Synchronizing key fragments…";
+      }
     }, CONFIG.LOADER_LOG_INTERVAL_MS);
   }
 
@@ -778,6 +819,7 @@
     session.puzzleTargetRatio = randRange(CONFIG.PUZZLE_TARGET_MIN, CONFIG.PUZZLE_TARGET_MAX);
     session.tiles = shuffleArray(TILE_DATA);
 
+    queryElements();
     initStep1();
     initStep2();
     initStep3();
@@ -791,5 +833,9 @@
     render();
   }
 
-  document.addEventListener("DOMContentLoaded", boot);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
 })();

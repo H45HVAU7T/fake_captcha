@@ -1,113 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Verification Required</title>
-<!-- Zero external requests: no fonts, no CDNs, no frameworks. Everything below loads from this one HTML file + style.css + app.js. -->
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Verification Required</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="stage">
+  <div class="stage">
 
-  <!-- Shared header shown above every step: shield mark + running status line -->
-  <header class="brand" aria-hidden="false">
-    <div class="brand-mark">
-      <svg class="shield" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M24 4L8 10V22C8 32.6 14.8 40.6 24 44C33.2 40.6 40 32.6 40 22V10L24 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path class="shield-check" d="M17 24L22 29L32 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="brand-text">
-      <span class="brand-name">EdgeGate</span>
-      <span class="brand-sub" id="statusLine">Attestation service</span>
-    </div>
-  </header>
-
-  <!-- Card is the single visual container; state machine in app.js swaps which <section> is visible -->
-  <main class="card" id="card">
-
-    <!-- STEP 1 — initial banner ------------------------------------------------ -->
-    <section class="step" id="step-intro" data-step="intro">
-      <div class="intro-icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M8 12.5L10.6 15L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Shared brand header -->
+    <header class="brand" aria-hidden="false">
+      <div class="brand-mark">
+        <svg class="shield" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M24 4L8 10V22C8 32.6 14.8 40.6 24 44C33.2 40.6 40 32.6 40 22V10L24 4Z" stroke="currentColor"
+            stroke-width="2.5" stroke-linejoin="round" />
+          <path class="shield-check" d="M17 24L22 29L32 18" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h1>Verify you are human</h1>
-      <p class="muted">Before we grant access to this session, complete a short security check. This helps us confirm the request is coming from a real attendee in the room.</p>
+      </div>
+    </header>
 
-      <label class="check-row" for="humanCheck">
-        <input type="checkbox" id="humanCheck">
-        <span class="check-box" aria-hidden="true"></span>
-        <span>I am a human attending this event</span>
-      </label>
+    <!-- Main interactive challenge card -->
+    <main class="card" id="card">
 
-      <button class="btn primary" id="btnStartVerify" disabled>Begin verification</button>
-      <p class="fine-print">Protected by EdgeGate &middot; Session ID <span class="mono" id="sessionId">—</span></p>
-    </section>
-
-    <!-- STEP 2 — regular text captcha ------------------------------------------ -->
-    <section class="step" id="step-captcha" data-step="captcha" hidden>
-      <h2>Enter the security code</h2>
-      <p class="muted small">Type the characters displayed in the image below.</p>
-
-      <div class="captcha-card">
-        <div class="captcha-preview">
-          <canvas id="captchaCanvas" width="280" height="84" aria-label="Security verification code"></canvas>
-          <div class="captcha-controls">
-            <button type="button" class="captcha-btn" id="btnRefreshCaptcha" title="Get a new code" aria-label="Get a new code">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/>
+      <!-- STEP 1 — reCAPTCHA Anchor Checkbox -->
+      <section class="step" id="step-intro" data-step="intro">
+        <div class="rc-anchor-container">
+          <label class="rc-anchor-checkbox-label" for="humanCheck">
+            <input type="checkbox" id="humanCheck">
+            <span class="rc-checkbox" id="rcCheckboxVisual"></span>
+            <span class="rc-anchor-text">I'm not a robot</span>
+          </label>
+          <div class="rc-anchor-pt">
+            <div class="rc-logo">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M24 4C12.95 4 4 12.95 4 24c0 4.1 1.25 7.9 3.4 11.08l4.42-4.42A13.9 13.9 0 0 1 10 24c0-7.73 6.27-14 14-14 3.4 0 6.5 1.23 8.92 3.27l4.35-4.35C33.6 5.8 29 4 24 4z"
+                  fill="#4285F4" />
+                <path
+                  d="M44 24c0-4.1-1.25-7.9-3.4-11.08l-4.42 4.42C37.3 19.34 38 21.58 38 24c0 7.73-6.27 14-14 14-3.4 0-6.5-1.23-8.92-3.27l-4.35 4.35C14.4 42.2 19 44 24 44c11.05 0 20-8.95 20-20z"
+                  fill="#34A853" />
+                <path
+                  d="M44 24l-8-8-8 8h5c0 6.08-4.92 11-11 11-2.6 0-4.97-.9-6.85-2.42l-4.35 4.35C13.6 41.2 18.5 43 24 43c10.5 0 19-8.5 19-19h1z"
+                  fill="#FBBC05" opacity="0.1" />
               </svg>
-            </button>
-            <button type="button" class="captcha-btn" id="btnAudioCaptcha" title="Audio code" aria-label="Listen to audio code">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
-              </svg>
-            </button>
+            </div>
+            <span class="rc-pt-text">reCAPTCHA</span>
+            <span class="rc-pt-links">Privacy - Terms</span>
           </div>
         </div>
+      </section>
 
-        <div class="captcha-input-group">
-          <input type="text" id="captchaInput" class="captcha-input"
-                 placeholder="Enter characters" maxlength="6" autocomplete="off"
-                 autocorrect="off" autocapitalize="characters" spellcheck="false"
-                 aria-label="Security code input">
+      <!-- STEP 2 — Slider / Jigsaw puzzle -->
+      <section class="step" id="step-slider" data-step="slider" hidden>
+        <div class="step-slider-inner">
+          <div class="puzzle-header">
+            <h2>Slide to complete the puzzle</h2>
+            <p>Drag the slider below to snap the piece into place.</p>
+          </div>
+
+          <div class="puzzle-frame" id="puzzleFrame">
+            <div class="puzzle-bg" id="puzzleBg"></div>
+            <div class="puzzle-notch" id="puzzleNotch" aria-hidden="true"></div>
+            <div class="puzzle-piece" id="puzzlePiece" aria-hidden="true"></div>
+          </div>
+
+          <div class="slider-track" id="sliderTrack">
+            <div class="slider-fill" id="sliderFill"></div>
+            <div class="slider-handle" id="sliderHandle" role="slider" tabindex="0" aria-label="Slide to verify"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+            <span class="slider-label" id="sliderLabel">Slide to fit piece</span>
+          </div>
+
+          <p class="hint-msg" id="sliderHint" aria-live="polite"></p>
         </div>
-      </div>
+      </section>
 
-      <button class="btn primary" id="btnVerifyCaptcha" disabled>Verify code</button>
-      <p class="hint-msg" id="captchaHint" aria-live="polite"></p>
-    </section>
-
-    <!-- STEP 3 — slider / jigsaw puzzle ------------------------------------------ -->
-    <section class="step" id="step-slider" data-step="slider" hidden>
-      <h2>Slide to align the fragment</h2>
-      <p class="muted small">Drag the puzzle piece until it snaps into the notch.</p>
-
-      <div class="puzzle-frame" id="puzzleFrame">
-        <div class="puzzle-bg" id="puzzleBg"></div>
-        <div class="puzzle-notch" id="puzzleNotch" aria-hidden="true"></div>
-        <div class="puzzle-piece" id="puzzlePiece" aria-hidden="true"></div>
-      </div>
-
-      <div class="slider-track" id="sliderTrack">
-        <div class="slider-fill" id="sliderFill"></div>
-        <div class="slider-handle" id="sliderHandle" role="slider" tabindex="0"
-             aria-label="Slide to verify" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+      <!-- STEP 3 — reCAPTCHA Grid Selection Challenge -->
+      <section class="step" id="step-grid" data-step="grid" hidden>
+        <div class="rc-header">
+          <h2 class="rc-header-title">
+            Select all squares with
+            <span class="rc-header-strong">phishing red flags</span>
+          </h2>
+          <p class="rc-header-sub">Click verify once you have selected all threats.</p>
         </div>
-        <span class="slider-label" id="sliderLabel">Slide to fit the piece</span>
-      </div>
-
-      <p class="hint-msg" id="sliderHint" aria-live="polite"></p>
-    </section>
 
     <!-- STEP 4 — grid anomaly selection ------------------------------------------ -->
     <section class="step" id="step-grid" data-step="grid" hidden>
@@ -118,9 +105,7 @@
         <!-- Tiles injected by app.js from TILE_DATA so labels/answers live in one place -->
       </div>
 
-      <button class="btn primary" id="btnConfirmGrid" disabled>Confirm selection</button>
-      <p class="hint-msg" id="gridHint" aria-live="polite"></p>
-    </section>
+    </main>
 
     <!-- STEP 5 — robot verification widget ------------------------------------ -->
     <section class="step" id="step-robot" data-step="robot" hidden>
@@ -199,12 +184,7 @@
     <span class="dot" data-dot="success"></span>
   </div>
 
-  <footer class="footer-note">
-    <span>This is a themed check-in experience, not a real security scan.</span>
-  </footer>
-
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
+
 </html>
