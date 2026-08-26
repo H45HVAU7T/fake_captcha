@@ -45,29 +45,18 @@
     "Provisioning stage access pass",
   ];
 
-  // Grid tile copy for Step 3: standard everyday object identification (bicycles)
-  // No cybersecurity or technical knowledge needed!
+  // Real photo grid items for Step 3 (Select all images with bicycles)
   const TILE_DATA = [
-    { label: "Road Bicycle",       isTarget: true,  pattern: "pattern-1", icon: "bike" },
-    { label: "Sedan Car",          isTarget: false, pattern: "pattern-2", icon: "car" },
-    { label: "Mountain Bicycle",   isTarget: true,  pattern: "pattern-3", icon: "bike" },
-    { label: "Traffic Signal",     isTarget: false, pattern: "pattern-4", icon: "traffic" },
-    { label: "City Bicycle",       isTarget: true,  pattern: "pattern-5", icon: "bike" },
-    { label: "City Bus",           isTarget: false, pattern: "pattern-6", icon: "bus" },
-    { label: "Fire Hydrant",       isTarget: false, pattern: "pattern-7", icon: "hydrant" },
-    { label: "Motorcycle",         isTarget: false, pattern: "pattern-8", icon: "motorcycle" },
-    { label: "Vintage Bicycle",    isTarget: true,  pattern: "pattern-9", icon: "bike" },
+    { label: "Road Bicycle",       isTarget: true,  src: "assets/tile-bike-1.jpg" },
+    { label: "Sedan Car",          isTarget: false, src: "assets/tile-car.jpg" },
+    { label: "Vintage Bicycle",    isTarget: true,  src: "assets/tile-bike-2.jpg" },
+    { label: "Traffic",            isTarget: false, src: "assets/tile-traffic.jpg" },
+    { label: "City Bicycle",       isTarget: true,  src: "assets/tile-bike-3.jpg" },
+    { label: "City Bus",           isTarget: false, src: "assets/tile-bus.jpg" },
+    { label: "Fire Hydrant",       isTarget: false, src: "assets/tile-hydrant.jpg" },
+    { label: "Motorcycle",         isTarget: false, src: "assets/tile-motor.jpg" },
+    { label: "Mountain Bicycle",   isTarget: true,  src: "assets/tile-bike-4.jpg" },
   ];
-
-  // Minimal inline icon set for everyday objects
-  const ICONS = {
-    bike: '<circle cx="5.5" cy="17.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18.5" cy="17.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 17.5l4-7h5l4 7M14.5 10.5l-4 7m4-7l-1.5-4h-3M10 7h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-    car: '<path d="M3 14l2-5h14l2 5v4h-2v-1H5v1H3v-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="15.5" r="1.8" fill="currentColor"/><circle cx="17" cy="15.5" r="1.8" fill="currentColor"/><path d="M5 9l1.5-4h11L19 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
-    traffic: '<rect x="8" y="2" width="8" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="6" r="1.6" fill="currentColor"/><circle cx="12" cy="11" r="1.6" fill="currentColor"/><circle cx="12" cy="16" r="1.6" fill="currentColor"/><path d="M12 20v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    bus: '<rect x="4" y="3" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="15" r="1.5" fill="currentColor"/><circle cx="16" cy="15" r="1.5" fill="currentColor"/><path d="M6 18v3M18 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    hydrant: '<path d="M8 8a4 4 0 0 1 8 0v11H8V8zM5 11h3m8 0h3M7 21h10M10 4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="1.8" fill="currentColor"/>',
-    motorcycle: '<circle cx="5" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="19" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 16l4-5h4l3 5M12 8h3l2 3M8 11h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-  };
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];
 
@@ -237,6 +226,7 @@
     let trackWidth = 0;
     let handleWidth = 0;
     let frameWidth = 0;
+    let frameHeight = 0;
     let maxHandleTravel = 0;
 
     function measure() {
@@ -245,9 +235,19 @@
       handleWidth = el.sliderHandle.offsetWidth;
       maxHandleTravel = Math.max(1, trackWidth - handleWidth - 4);
       frameWidth = el.puzzleFrame.clientWidth;
+      frameHeight = el.puzzleFrame.clientHeight;
 
       const notchLeft = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
-      if (el.puzzleNotch) el.puzzleNotch.style.left = `${Math.max(0, notchLeft)}px`;
+      const notchTop = frameHeight * 0.35;
+      if (el.puzzleNotch) {
+        el.puzzleNotch.style.left = `${Math.max(0, notchLeft)}px`;
+        el.puzzleNotch.style.top = `${notchTop}px`;
+      }
+      if (el.puzzlePiece) {
+        el.puzzlePiece.style.top = `${notchTop}px`;
+        el.puzzlePiece.style.backgroundSize = `${frameWidth}px ${frameHeight}px`;
+        el.puzzlePiece.style.backgroundPosition = `-${Math.max(0, notchLeft)}px -${notchTop}px`;
+      }
     }
 
     function setFraction(fraction) {
@@ -365,7 +365,7 @@
   }
 
   /* =======================================================================
-     STEP 3 — 3x3 Grid Challenge (Everyday Objects / Bicycles)
+     STEP 3 — 3x3 Real Photo Grid Challenge (Bicycles)
      ======================================================================= */
   function renderGridTiles() {
     if (!el.grid3) return;
@@ -380,10 +380,7 @@
       btn.setAttribute("aria-pressed", "false");
       btn.setAttribute("aria-label", tile.label);
       btn.innerHTML = `
-        <span class="tile-art ${tile.pattern}">
-          <svg class="tile-icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[tile.icon] || ""}</svg>
-          <span class="tile-caption">${tile.label}</span>
-        </span>
+        <img class="tile-img" src="${tile.src}" alt="${tile.label}" loading="eager" draggable="false">
         <span class="tile-check">✓</span>
       `;
       btn.addEventListener("click", () => toggleTile(i, btn));
