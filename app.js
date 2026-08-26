@@ -11,8 +11,11 @@
      CONFIG — tweak these to retune puzzle difficulty / timings
      --------------------------------------------------------------------- */
   const CONFIG = {
-    // Step 2 slider/jigsaw
-    PUZZLE_TARGET_RATIO: 0.62,   // where the notch sits, as a fraction of frame width (0-1)
+    // Step 2 slider/jigsaw — notch position is randomized per page load between
+    // these two ratios (see session.puzzleTargetRatio in boot()) so the exact
+    // drag distance differs from person to person and can't be called out loud.
+    PUZZLE_TARGET_MIN: 0.30,
+    PUZZLE_TARGET_MAX: 0.82,
     PUZZLE_TOLERANCE_PX: 10,     // how close the piece must land to the notch to "snap"
     PUZZLE_PIECE_SIZE: 44,       // must match .puzzle-piece / .puzzle-notch width in CSS
 
@@ -87,6 +90,14 @@
     startTime: null,
   };
 
+  // Per-page-load randomization so the puzzle isn't identical for everyone
+  // in the room. Computed once in boot() and read everywhere else — nothing
+  // here is persisted, so a reload gets a fresh layout too.
+  const session = {
+    puzzleTargetRatio: 0.5, // overwritten in boot()
+    tiles: [],              // shuffled copy of TILE_DATA, overwritten in boot()
+  };
+
   /* ---------------------------------------------------------------------
      DOM refs
      --------------------------------------------------------------------- */
@@ -132,6 +143,20 @@
     Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join("").toUpperCase();
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+  // Random float in [min, max) — used to place the puzzle notch differently per page load
+  const randRange = (min, max) => min + Math.random() * (max - min);
+
+  // Fisher-Yates shuffle, returns a new array (never mutates the input,
+  // so TILE_DATA itself stays a stable source of truth)
+  function shuffleArray(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
 
   function saveProgress() {
     try {
@@ -229,8 +254,9 @@
       maxHandleTravel = trackWidth - handleWidth - 4; // 4 = 2px inset each side
       frameWidth = el.puzzleFrame.clientWidth;
 
-      // Position the notch at the target ratio (minus half piece width to center it)
-      const notchLeft = frameWidth * CONFIG.PUZZLE_TARGET_RATIO - CONFIG.PUZZLE_PIECE_SIZE / 2;
+      // Position the notch at this session's random target ratio (minus half
+      // piece width to center it) — differs per page load, see boot()
+      const notchLeft = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
       el.puzzleNotch.style.left = `${notchLeft}px`;
     }
 
@@ -255,7 +281,7 @@
     function checkSnap(fraction) {
       const pieceMaxTravel = frameWidth - CONFIG.PUZZLE_PIECE_SIZE;
       const pieceX = fraction * pieceMaxTravel;
-      const notchX = frameWidth * CONFIG.PUZZLE_TARGET_RATIO - CONFIG.PUZZLE_PIECE_SIZE / 2;
+      const notchX = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
 
       if (Math.abs(pieceX - notchX) <= CONFIG.PUZZLE_TOLERANCE_PX) {
         // Snap exactly into place for a satisfying "locked in" feel
@@ -353,7 +379,7 @@
      STEP 3 — 3x3 anomaly grid
      ======================================================================= */
   function initStep3() {
-    TILE_DATA.forEach((tile, i) => {
+    session.tiles.forEach((tile, i) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "tile";
@@ -390,8 +416,8 @@
   }
 
   function confirmGrid() {
-    const correctCount = TILE_DATA.filter((t, i) => t.anomaly && state.gridSelected.has(i)).length;
-    const wrongCount = [...state.gridSelected].filter((i) => !TILE_DATA[i].anomaly).length;
+    const correctCount = session.tiles.filter((t, i) => t.anomaly && state.gridSelected.has(i)).length;
+    const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].anomaly).length;
 
     if (correctCount >= CONFIG.GRID_REQUIRED_CORRECT && wrongCount === 0) {
       el.gridHint.textContent = "Selection confirmed";
@@ -484,6 +510,11 @@
      BOOT
      --------------------------------------------------------------------- */
   function boot() {
+    // Randomize per page load so the puzzle differs from person to person —
+    // one attendee solving it and shouting the answer shouldn't help anyone else.
+    session.puzzleTargetRatio = randRange(CONFIG.PUZZLE_TARGET_MIN, CONFIG.PUZZLE_TARGET_MAX);
+    session.tiles = shuffleArray(TILE_DATA);
+
     initStep1();
     initStep2();
     initStep3();
