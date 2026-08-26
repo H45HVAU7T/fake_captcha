@@ -1,0 +1,494 @@
+/* =========================================================================
+   TOKENS
+   Palette pulled from real enterprise-verification UIs (indigo-blue accent,
+   near-black surface, verified-green success) rather than a generic AI
+   dark-mode default. Monospace is used only for machine-looking strings
+   (session ids, tokens, log lines) to sell the "real telemetry" feeling.
+   ========================================================================= */
+:root{
+  --bg: #0b0d12;
+  --bg-grid: #101319;
+  --surface: #14171f;
+  --surface-2: #1b1f29;
+  --border: #262b36;
+  --text: #e7e9ee;
+  --text-muted: #8890a0;
+  --text-dim: #565d6d;
+  --accent: #5b7cfa;
+  --accent-dim: #34406e;
+  --accent-glow: rgba(91,124,250,0.35);
+  --danger: #ff5c72;
+  --success: #2ecf82;
+  --success-glow: rgba(46,207,130,0.35);
+
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body{
+  /* Faint grid backdrop = "network security" texture without an image asset */
+  background-image:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center;
+}
+
+.mono{ font-family: var(--font-mono); }
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.stage{
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
+  gap: 18px;
+}
+
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 380px;
+}
+.brand-mark{
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  color: var(--accent);
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+  flex-shrink: 0;
+}
+.shield{ width: 100%; height: 100%; }
+.shield-check{
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: draw-check 900ms 300ms ease forwards;
+}
+@keyframes draw-check{ to{ stroke-dashoffset: 0; } }
+
+.brand-text{ display: flex; flex-direction: column; line-height: 1.25; }
+.brand-name{ font-weight: 650; font-size: 15px; letter-spacing: 0.2px; }
+.brand-sub{ font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+.card{
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 22px 24px;
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle top sheen so the card reads as "glass panel" rather than a flat div */
+.card::before{
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+}
+
+.step h1{
+  font-size: 19px;
+  margin: 4px 0 8px;
+  letter-spacing: -0.2px;
+}
+.step h2{
+  font-size: 16.5px;
+  margin: 2px 0 6px;
+  letter-spacing: -0.1px;
+}
+.muted{ color: var(--text-muted); font-size: 13.5px; line-height: 1.5; margin: 0 0 18px; }
+.muted.small{ font-size: 13px; margin-bottom: 16px; }
+
+.fine-print{
+  color: var(--text-dim);
+  font-size: 11.5px;
+  margin: 16px 0 0;
+  text-align: center;
+}
+
+/* =========================================================================
+   STEP 1 — intro
+   ========================================================================= */
+.intro-icon{
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--accent);
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+}
+.intro-icon svg{ width: 24px; height: 24px; }
+
+.check-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 16px;
+  user-select: none;
+}
+.check-row input{ position: absolute; opacity: 0; width: 0; height: 0; }
+.check-box{
+  width: 19px; height: 19px;
+  border-radius: 5px;
+  border: 1.5px solid var(--text-dim);
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 150ms, background 150ms;
+}
+.check-row input:checked + .check-box{
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.check-row input:checked + .check-box::after{
+  content: "";
+  position: absolute;
+  left: 5px; top: 1.5px;
+  width: 5px; height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.check-row input:focus-visible + .check-box{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
+   BUTTONS
+   ========================================================================= */
+.btn{
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  font-size: 14.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 100ms ease, opacity 150ms ease, background 150ms ease;
+}
+.btn:active{ transform: scale(0.98); }
+.btn.primary{
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 8px 20px -8px var(--accent-glow);
+}
+.btn.primary:disabled{
+  background: var(--surface-2);
+  color: var(--text-dim);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn.primary:not(:disabled):hover{ background: #6d8afc; }
+.btn:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* =========================================================================
+   STEP 2 — jigsaw / slider puzzle
+   ========================================================================= */
+.puzzle-frame{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 18px;
+  background: var(--surface-2);
+}
+
+/* TEAM NOTE: replace this gradient with `background-image:url('assets/puzzle-bg.webp')`
+   plus `background-size: cover; background-position: center;` — nothing else needs to change. */
+.puzzle-bg{
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(91,124,250,0.35), transparent 55%),
+    radial-gradient(circle at 75% 70%, rgba(46,207,130,0.25), transparent 50%),
+    linear-gradient(135deg, #1c2130, #0e1017);
+}
+
+.puzzle-notch{
+  position: absolute;
+  top: 38%;
+  width: 44px; height: 44px;
+  /* left is set inline by app.js (PUZZLE_TARGET_RATIO * frame width) */
+  border-radius: 8px;
+  border: 2px dashed rgba(255,255,255,0.35);
+  background: rgba(0,0,0,0.25);
+}
+
+.puzzle-piece{
+  position: absolute;
+  top: 38%;
+  left: 0; /* moved by app.js via transform as the slider drags */
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f6df0, #6f8bff);
+  box-shadow: 0 6px 16px -4px rgba(0,0,0,0.5);
+  will-change: transform;
+}
+
+.slider-track{
+  position: relative;
+  height: 46px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  touch-action: none; /* we handle horizontal drag ourselves */
+}
+.slider-fill{
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%; /* driven by app.js */
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+  border-radius: 999px 0 0 999px;
+}
+.slider-label{
+  position: relative;
+  margin: 0 auto;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.slider-handle{
+  position: absolute;
+  left: 2px; /* moved via transform by app.js, left stays the 0-origin */
+  top: 2px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--bg);
+  display: grid; place-items: center;
+  cursor: grab;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  will-change: transform;
+}
+.slider-handle:active{ cursor: grabbing; }
+.slider-handle svg{ width: 20px; height: 20px; }
+.slider-handle:focus-visible{ outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.hint-msg{
+  min-height: 18px;
+  font-size: 12.5px;
+  margin: 10px 0 0;
+  text-align: center;
+}
+.hint-msg.error{ color: var(--danger); }
+.hint-msg.ok{ color: var(--success); }
+
+/* =========================================================================
+   STEP 3 — 3x3 anomaly grid
+   ========================================================================= */
+.grid3{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.tile{
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+}
+.tile-art{
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  color: var(--text-dim);
+}
+.tile-art svg{ width: 30%; height: 30%; }
+.tile.selected{
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 3px var(--accent-glow);
+}
+.tile-check{
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+}
+.tile.selected .tile-check{ display: flex; }
+
+/* Distinct placeholder art per tile so the grid doesn't look like nine identical boxes.
+   TEAM NOTE: swap each .tile-art background for a real <img> of a UI screenshot / email. */
+.tile-art.pattern-1{ background: repeating-linear-gradient(45deg, #1e2330, #1e2330 8px, #262c3c 8px, #262c3c 16px); }
+.tile-art.pattern-2{ background: radial-gradient(circle, #24304a, #171b24); }
+.tile-art.pattern-3{ background: linear-gradient(160deg, #2a1e24, #171b24); }
+.tile-art.pattern-4{ background: repeating-linear-gradient(-45deg, #1a2a24, #1a2a24 8px, #22352d 8px, #22352d 16px); }
+.tile-art.pattern-5{ background: linear-gradient(160deg, #202436, #14161d); }
+.tile-art.pattern-6{ background: radial-gradient(circle, #2c2036, #171b24); }
+.tile-art.pattern-7{ background: linear-gradient(160deg, #1e2836, #14161d); }
+.tile-art.pattern-8{ background: repeating-linear-gradient(45deg, #241e1e, #241e1e 8px, #302626 8px, #302626 16px); }
+.tile-art.pattern-9{ background: linear-gradient(160deg, #1c2a2a, #14161d); }
+
+/* =========================================================================
+   STEP 4 — loader
+   ========================================================================= */
+.loader-ring{
+  position: relative;
+  width: 96px; height: 96px;
+  margin: 4px auto 16px;
+}
+.loader-ring svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg{ fill: none; stroke: var(--surface-2); stroke-width: 8; }
+.ring-fg{
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 276.5; /* 2*pi*44 */
+  stroke-dashoffset: 276.5; /* set by app.js as progress climbs */
+  transition: stroke-dashoffset 220ms linear;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+.ring-pct{
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.log-console{
+  margin-top: 16px;
+  background: #090a0d;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  height: 108px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.log-line{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: log-in 220ms ease;
+}
+.log-line .ok{ color: var(--success); }
+@keyframes log-in{
+  from{ opacity: 0; transform: translateY(4px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================================
+   STEP 5 — success
+   ========================================================================= */
+.success-icon{
+  width: 64px; height: 64px;
+  margin: 4px auto 16px;
+  color: var(--success);
+  filter: drop-shadow(0 0 10px var(--success-glow));
+}
+.success-icon svg{ width: 100%; height: 100%; }
+.success-circle{
+  stroke: var(--success);
+  stroke-width: 3;
+  stroke-dasharray: 151; /* 2*pi*24 */
+  stroke-dashoffset: 151;
+  animation: draw-circle 500ms ease forwards;
+}
+.success-check{
+  stroke: var(--success);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: draw-check2 400ms 450ms ease forwards;
+}
+@keyframes draw-circle{ to{ stroke-dashoffset: 0; } }
+@keyframes draw-check2{ to{ stroke-dashoffset: 0; } }
+
+#step-success h1{ text-align: center; }
+#step-success .muted{ text-align: center; }
+#step-success .fine-print{ margin-top: 18px; }
+
+/* =========================================================================
+   PROGRESS DOTS + FOOTER
+   ========================================================================= */
+.progress-dots{
+  display: flex;
+  gap: 6px;
+}
+.dot{
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 200ms, transform 200ms;
+}
+.dot.active{ background: var(--accent); transform: scale(1.3); }
+.dot.done{ background: var(--success); }
+
+.footer-note{
+  color: var(--text-dim);
+  font-size: 11px;
+  text-align: center;
+  max-width: 320px;
+}
+
+/* =========================================================================
+   RESPONSIVE — tighten up on very small phones
+   ========================================================================= */
+@media (max-width: 360px){
+  .card{ padding: 22px 18px 20px; }
+  .step h1{ font-size: 18px; }
+}
+
+/* Slightly larger card on tablets/desktop, still mobile-first by default */
+@media (min-width: 480px){
+  .card, .brand{ max-width: 420px; }
+}
