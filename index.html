@@ -1,149 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Verification Required</title>
-<!-- Zero external requests: no fonts, no CDNs, no frameworks. Everything below loads from this one HTML file + style.css + app.js. -->
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Verification Required</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="stage">
+  <div class="stage">
 
-  <!-- Shared header shown above every step: shield mark + running status line -->
-  <header class="brand" aria-hidden="false">
-    <div class="brand-mark">
-      <svg class="shield" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M24 4L8 10V22C8 32.6 14.8 40.6 24 44C33.2 40.6 40 32.6 40 22V10L24 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-        <path class="shield-check" d="M17 24L22 29L32 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="brand-text">
-      <span class="brand-name">EdgeGate</span>
-      <span class="brand-sub" id="statusLine">Attestation service</span>
-    </div>
-  </header>
-
-  <!-- Card is the single visual container; state machine in app.js swaps which <section> is visible -->
-  <main class="card" id="card">
-
-    <!-- STEP 1 — initial banner ------------------------------------------------ -->
-    <section class="step" id="step-intro" data-step="intro">
-      <div class="intro-icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M8 12.5L10.6 15L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Shared brand header -->
+    <header class="brand" aria-hidden="false">
+      <div class="brand-mark">
+        <svg class="shield" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M24 4L8 10V22C8 32.6 14.8 40.6 24 44C33.2 40.6 40 32.6 40 22V10L24 4Z" stroke="currentColor"
+            stroke-width="2.5" stroke-linejoin="round" />
+          <path class="shield-check" d="M17 24L22 29L32 18" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
-      <h1>Verify you are human</h1>
-      <p class="muted">Before we grant access to this session, complete a short security check. This helps us confirm the request is coming from a real attendee in the room.</p>
-
-      <label class="check-row" for="humanCheck">
-        <input type="checkbox" id="humanCheck">
-        <span class="check-box" aria-hidden="true"></span>
-        <span>I am a human attending this event</span>
-      </label>
-
-      <button class="btn primary" id="btnStartVerify" disabled>Begin verification</button>
-      <p class="fine-print">Protected by EdgeGate &middot; Session ID <span class="mono" id="sessionId">—</span></p>
-    </section>
-
-    <!-- STEP 2 — slider / jigsaw puzzle ------------------------------------------ -->
-    <section class="step" id="step-slider" data-step="slider" hidden>
-      <h2>Slide to align the fragment</h2>
-      <p class="muted small">Drag the puzzle piece until it snaps into the notch.</p>
-
-      <div class="puzzle-frame" id="puzzleFrame">
-        <!-- TEAM NOTE: swap this gradient div for a real <img src="assets/puzzle-bg.webp">.
-             The cutout/piece positions below are computed from puzzleFrame's rendered width in app.js,
-             so any background image will still line up correctly. -->
-        <div class="puzzle-bg" id="puzzleBg"></div>
-
-        <!-- The notch is the empty socket the piece should end up over -->
-        <div class="puzzle-notch" id="puzzleNotch" aria-hidden="true"></div>
-
-        <!-- The draggable puzzle piece (visually a "cut out" chunk of the bg) -->
-        <div class="puzzle-piece" id="puzzlePiece" aria-hidden="true"></div>
+      <div class="brand-text">
+        <span class="brand-name">EdgeGate</span>
+        <span class="brand-sub" id="statusLine">Attestation service</span>
       </div>
+    </header>
 
-      <div class="slider-track" id="sliderTrack">
-        <div class="slider-fill" id="sliderFill"></div>
-        <div class="slider-handle" id="sliderHandle" role="slider" tabindex="0"
-             aria-label="Slide to verify" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+    <!-- Main interactive challenge card -->
+    <main class="card" id="card">
+
+      <!-- STEP 1 — reCAPTCHA Anchor Checkbox -->
+      <section class="step" id="step-intro" data-step="intro">
+        <div class="rc-anchor-container">
+          <label class="rc-anchor-checkbox-label" for="humanCheck">
+            <input type="checkbox" id="humanCheck">
+            <span class="rc-checkbox" id="rcCheckboxVisual"></span>
+            <span class="rc-anchor-text">I'm not a robot</span>
+          </label>
+          <div class="rc-anchor-pt">
+            <div class="rc-logo">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M24 4C12.95 4 4 12.95 4 24c0 4.1 1.25 7.9 3.4 11.08l4.42-4.42A13.9 13.9 0 0 1 10 24c0-7.73 6.27-14 14-14 3.4 0 6.5 1.23 8.92 3.27l4.35-4.35C33.6 5.8 29 4 24 4z"
+                  fill="#4285F4" />
+                <path
+                  d="M44 24c0-4.1-1.25-7.9-3.4-11.08l-4.42 4.42C37.3 19.34 38 21.58 38 24c0 7.73-6.27 14-14 14-3.4 0-6.5-1.23-8.92-3.27l-4.35 4.35C14.4 42.2 19 44 24 44c11.05 0 20-8.95 20-20z"
+                  fill="#34A853" />
+                <path
+                  d="M44 24l-8-8-8 8h5c0 6.08-4.92 11-11 11-2.6 0-4.97-.9-6.85-2.42l-4.35 4.35C13.6 41.2 18.5 43 24 43c10.5 0 19-8.5 19-19h1z"
+                  fill="#FBBC05" opacity="0.1" />
+              </svg>
+            </div>
+            <span class="rc-pt-text">reCAPTCHA</span>
+            <span class="rc-pt-links">Privacy - Terms</span>
+          </div>
         </div>
-        <span class="slider-label" id="sliderLabel">Slide to fit the piece</span>
-      </div>
+      </section>
 
-      <p class="hint-msg" id="sliderHint" aria-live="polite"></p>
-    </section>
+      <!-- STEP 2 — Slider / Jigsaw puzzle -->
+      <section class="step" id="step-slider" data-step="slider" hidden>
+        <div class="step-slider-inner">
+          <div class="puzzle-header">
+            <h2>Slide to complete the puzzle</h2>
+            <p>Drag the slider below to snap the piece into place.</p>
+          </div>
 
-    <!-- STEP 3 — grid anomaly selection ------------------------------------------ -->
-    <section class="step" id="step-grid" data-step="grid" hidden>
-      <h2>Select all anomalies</h2>
-      <p class="muted small">Tap every tile that shows a phishing red flag, then confirm.</p>
+          <div class="puzzle-frame" id="puzzleFrame">
+            <div class="puzzle-bg" id="puzzleBg"></div>
+            <div class="puzzle-notch" id="puzzleNotch" aria-hidden="true"></div>
+            <div class="puzzle-piece" id="puzzlePiece" aria-hidden="true"></div>
+          </div>
 
-      <!-- TEAM NOTE: each tile below is a placeholder gradient + label icon.
-           To use real imagery: replace .tile-art background with an <img> per tile
-           and set data-anomaly="true|false" on the ones that should count as correct. -->
-      <div class="grid3" id="grid3">
-        <!-- Tiles injected by app.js from TILE_DATA so labels/answers live in one place -->
-      </div>
+          <div class="slider-track" id="sliderTrack">
+            <div class="slider-fill" id="sliderFill"></div>
+            <div class="slider-handle" id="sliderHandle" role="slider" tabindex="0" aria-label="Slide to verify"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+            <span class="slider-label" id="sliderLabel">Slide to fit piece</span>
+          </div>
 
-      <button class="btn primary" id="btnConfirmGrid" disabled>Confirm selection</button>
-      <p class="hint-msg" id="gridHint" aria-live="polite"></p>
-    </section>
+          <p class="hint-msg" id="sliderHint" aria-live="polite"></p>
+        </div>
+      </section>
 
-    <!-- STEP 4 — fake aggregation / progress loader ------------------------------ -->
-    <section class="step" id="step-loading" data-step="loading" hidden>
-      <div class="loader-ring">
-        <svg viewBox="0 0 100 100" aria-hidden="true">
-          <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
-          <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="44"></circle>
-        </svg>
-        <span class="ring-pct" id="ringPct">0%</span>
-      </div>
-      <h2>Finalizing room quorum</h2>
-      <p class="muted small" id="loaderStatus">Initializing…</p>
+      <!-- STEP 3 — reCAPTCHA Grid Selection Challenge -->
+      <section class="step" id="step-grid" data-step="grid" hidden>
+        <div class="rc-header">
+          <h2 class="rc-header-title">
+            Select all squares with
+            <span class="rc-header-strong">phishing red flags</span>
+          </h2>
+          <p class="rc-header-sub">Click verify once you have selected all threats.</p>
+        </div>
 
-      <div class="log-console" id="logConsole" aria-live="polite">
-        <!-- Fake telemetry lines are appended here by app.js -->
-      </div>
-    </section>
+        <div class="rc-body">
+          <div class="grid3" id="grid3">
+            <!-- Tiles injected dynamically by app.js -->
+          </div>
+        </div>
 
-    <!-- STEP 5 — success ---------------------------------------------------------- -->
-    <section class="step" id="step-success" data-step="success" hidden>
-      <div class="success-icon">
-        <svg viewBox="0 0 52 52" aria-hidden="true">
-          <circle class="success-circle" cx="26" cy="26" r="24" fill="none"/>
-          <path class="success-check" fill="none" d="M14 27l7 7 17-17"/>
-        </svg>
-      </div>
-      <h1>Access authorized</h1>
-      <p class="muted">Direct your attention to the main stage screen.</p>
-      <p class="fine-print">Verified in <span class="mono" id="verifyTime">—</span> &middot; Token <span class="mono" id="tokenId">—</span></p>
-    </section>
+        <p class="hint-msg" id="gridHint" aria-live="polite" style="margin: 4px 14px 2px;"></p>
 
-  </main>
+        <div class="rc-footer">
+          <div class="rc-controls">
+            <!-- Reload icon -->
+            <button class="rc-icon-btn" type="button" id="btnReloadGrid" aria-label="Get a new challenge">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+              </svg>
+            </button>
+            <!-- Audio challenge icon -->
+            <button class="rc-icon-btn" type="button" aria-label="Audio challenge">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </button>
+            <!-- Info icon -->
+            <button class="rc-icon-btn" type="button" aria-label="Help and Info">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+            </button>
+          </div>
 
-  <!-- Progress dots showing where we are in the 5-step flow -->
-  <div class="progress-dots" id="progressDots" aria-hidden="true">
-    <span class="dot" data-dot="intro"></span>
-    <span class="dot" data-dot="slider"></span>
-    <span class="dot" data-dot="grid"></span>
-    <span class="dot" data-dot="loading"></span>
-    <span class="dot" data-dot="success"></span>
+          <button class="rc-button" id="btnConfirmGrid" disabled>Verify</button>
+        </div>
+      </section>
+
+      <!-- STEP 4 — Fake aggregation / progress loader -->
+      <section class="step" id="step-loading" data-step="loading" hidden>
+        <div class="step-loader-inner">
+          <div class="loader-ring">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+              <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="44"></circle>
+            </svg>
+            <span class="ring-pct" id="ringPct">0%</span>
+          </div>
+          <h2 class="loader-title">Finalizing Room Quorum</h2>
+          <p class="loader-sub" id="loaderStatus">Initializing…</p>
+
+          <div class="log-console" id="logConsole" aria-live="polite">
+            <!-- Live fake telemetry injected here by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 5 — Success Screen -->
+      <section class="step" id="step-success" data-step="success" hidden>
+        <div class="step-success-inner">
+          <div class="success-icon">
+            <svg viewBox="0 0 52 52" aria-hidden="true">
+              <circle class="success-circle" cx="26" cy="26" r="24" fill="none" />
+              <path class="success-check" fill="none" d="M14 27l7 7 17-17" />
+            </svg>
+          </div>
+          <h1 class="success-title">Access Authorized</h1>
+          <p class="success-desc">Direct your attention to the main auditorium stage screen.</p>
+          <p class="fine-print">Verified in <span class="mono" id="verifyTime">—</span> &middot; Session Token <span
+              class="mono" id="tokenId">—</span></p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Progress dots showing step sequence -->
+    <div class="progress-dots" id="progressDots" aria-hidden="true">
+      <span class="dot" data-dot="intro"></span>
+      <span class="dot" data-dot="slider"></span>
+      <span class="dot" data-dot="grid"></span>
+      <span class="dot" data-dot="loading"></span>
+      <span class="dot" data-dot="success"></span>
+    </div>
+
   </div>
 
-  <footer class="footer-note">
-    <span>This is a themed check-in experience, not a real security scan.</span>
-  </footer>
-
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
+
 </html>
