@@ -5,10 +5,10 @@
 :root {
   --bg: #0b0d12;
   --bg-grid: #141822;
-  --surface: #ffffff;
-  --surface-subtle: #f9f9f9;
-  --border: #d3d3d3;
-  --border-light: #e5e5e5;
+  --surface: rgba(255, 255, 255, 0.75);
+  --surface-subtle: rgba(249, 249, 249, 0.65);
+  --border: rgba(255, 255, 255, 0.35);
+  --border-light: rgba(0, 0, 0, 0.1);
   --text-main: #222222;
   --text-muted: #555555;
   --text-dim: #777777;
@@ -46,10 +46,12 @@ body {
 
 body {
   background-image:
-    linear-gradient(var(--bg-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(rgba(11, 13, 18, 0.25), rgba(11, 13, 18, 0.4)),
+    url("assets/background.png");
+  background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -134,11 +136,13 @@ body {
 .card {
   width: 100%;
   max-width: 380px;
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   color: var(--text-main);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 6px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
   transition: box-shadow 200ms ease;
@@ -160,7 +164,9 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: var(--surface-subtle);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   min-height: 74px;
 }
 
@@ -182,9 +188,9 @@ body {
 .rc-checkbox {
   width: 28px;
   height: 28px;
-  border: 2px solid #c1c1c1;
+  border: 2px solid rgba(160, 160, 160, 0.75);
   border-radius: 2px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.8);
   margin-right: 14px;
   display: flex;
   align-items: center;
@@ -347,8 +353,8 @@ body {
 .slider-track {
   position: relative;
   height: 44px;
-  background: #f1f3f4;
-  border: 1px solid var(--border);
+  background: rgba(241, 243, 244, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 24px;
   display: flex;
   align-items: center;
@@ -413,7 +419,9 @@ body {
    STEP 3: RECAPTCHA PHOTO GRID CHALLENGE
    ========================================================================= */
 .rc-header {
-  background: var(--rc-blue);
+  background: rgba(26, 115, 232, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #ffffff;
   padding: 18px 16px 16px;
 }
@@ -441,13 +449,25 @@ body {
 
 .rc-body {
   padding: 6px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .grid3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 3px;
+}
+
+.grid3.shake {
+  animation: rc-grid-shake 360ms ease-in-out;
+}
+
+@keyframes rc-grid-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
 .tile {
@@ -506,12 +526,14 @@ body {
 }
 
 .rc-footer {
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .rc-controls {
@@ -644,8 +666,8 @@ body {
 }
 
 .log-console {
-  background: #f8f9fa;
-  border: 1px solid var(--border-light);
+  background: rgba(248, 249, 250, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   padding: 10px 12px;
   height: 100px;
