@@ -47,15 +47,15 @@
 
   // Real photo grid items for Step 3 (Select all images with bicycles)
   const TILE_DATA = [
-    { label: "Road Bicycle",       isTarget: true,  src: "assets/tile-bike-1.jpg" },
-    { label: "Sedan Car",          isTarget: false, src: "assets/tile-car.jpg" },
-    { label: "Vintage Bicycle",    isTarget: true,  src: "assets/tile-bike-2.jpg" },
-    { label: "Traffic",            isTarget: false, src: "assets/tile-traffic.jpg" },
-    { label: "City Bicycle",       isTarget: true,  src: "assets/tile-bike-3.jpg" },
-    { label: "City Bus",           isTarget: false, src: "assets/tile-bus.jpg" },
-    { label: "Fire Hydrant",       isTarget: false, src: "assets/tile-hydrant.jpg" },
-    { label: "Motorcycle",         isTarget: false, src: "assets/tile-motor.jpg" },
-    { label: "Mountain Bicycle",   isTarget: true,  src: "assets/tile-bike-4.jpg" },
+    { label: "Road Bicycle",       isTarget: true,  src: "assets/tile-bike-1.webp" },
+    { label: "Sedan Car",          isTarget: false, src: "assets/tile-car.webp" },
+    { label: "Vintage Bicycle",    isTarget: true,  src: "assets/tile-bike-2.webp" },
+    { label: "Traffic",            isTarget: false, src: "assets/tile-traffic.webp" },
+    { label: "City Bicycle",       isTarget: true,  src: "assets/tile-bike-3.webp" },
+    { label: "City Bus",           isTarget: false, src: "assets/tile-bus.webp" },
+    { label: "Fire Hydrant",       isTarget: false, src: "assets/tile-hydrant.webp" },
+    { label: "Motorcycle",         isTarget: false, src: "assets/tile-motor.webp" },
+    { label: "Mountain Bicycle",   isTarget: true,  src: "assets/tile-bike-4.webp" },
   ];
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];

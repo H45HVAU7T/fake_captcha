@@ -47,7 +47,7 @@ body {
 body {
   background-image:
     linear-gradient(rgba(11, 13, 18, 0.25), rgba(11, 13, 18, 0.4)),
-    url("assets/background.png");
+    url("assets/background.webp");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -320,7 +320,7 @@ body {
 .puzzle-bg {
   position: absolute;
   inset: 0;
-  background-image: url('assets/puzzle-bg.jpg');
+  background-image: url('assets/puzzle-bg.webp');
   background-size: cover;
   background-position: center;
 }
@@ -344,7 +344,7 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 6px;
-  background-image: url('assets/puzzle-bg.jpg');
+  background-image: url('assets/puzzle-bg.webp');
   background-size: cover;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 0 0 1.5px rgba(255, 255, 255, 0.6);
   will-change: transform;
