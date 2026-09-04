@@ -13,18 +13,18 @@
   const CONFIG = {
     // Step 2 slider/jigsaw — notch position is randomized per page load between
     // these two ratios so the exact drag distance differs from person to person.
-    PUZZLE_TARGET_MIN: 0.30,
+    PUZZLE_TARGET_MIN: 0.3,
     PUZZLE_TARGET_MAX: 0.82,
-    PUZZLE_TOLERANCE_PX: 14,     // how close the piece must land to the notch to "snap"
-    PUZZLE_PIECE_SIZE: 44,       // must match .puzzle-piece / .puzzle-notch width in CSS
+    PUZZLE_TOLERANCE_PX: 14, // how close the piece must land to the notch to "snap"
+    PUZZLE_PIECE_SIZE: 44, // must match .puzzle-piece / .puzzle-notch width in CSS
 
     // Step 3 grid puzzle — require all 4 correct BNM auditorium images
     GRID_REQUIRED_CORRECT: 4,
 
     // Step 4 fake loader
-    LOADER_TARGET_PCT: 92,       // loader climbs to this, never quite hits 100 on its own
-    LOADER_FINAL_JUMP_MS: 550,   // after target reached, short pause then jump to 100%
-    LOADER_TICK_MS: 90,          // how often the progress ring updates
+    LOADER_TARGET_PCT: 92, // loader climbs to this, never quite hits 100 on its own
+    LOADER_FINAL_JUMP_MS: 550, // after target reached, short pause then jump to 100%
+    LOADER_TICK_MS: 90, // how often the progress ring updates
     LOADER_LOG_INTERVAL_MS: 620, // how often a new fake log line appears
 
     // localStorage key for resuming progress if the page reloads mid-flow
@@ -126,7 +126,11 @@
      UTIL
      --------------------------------------------------------------------- */
   const randHex = (len) =>
-    Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join("").toUpperCase();
+    Array.from({ length: len }, () =>
+      Math.floor(Math.random() * 16).toString(16),
+    )
+      .join("")
+      .toUpperCase();
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const randRange = (min, max) => min + Math.random() * (max - min);
@@ -159,7 +163,9 @@
   }
 
   function clearProgress() {
-    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch (e) {}
+    try {
+      localStorage.removeItem(CONFIG.STORAGE_KEY);
+    } catch (e) {}
   }
 
   /* ---------------------------------------------------------------------
@@ -216,7 +222,8 @@
         if (el.rcCheckboxVisual) el.rcCheckboxVisual.classList.add("loading");
 
         setTimeout(() => {
-          if (el.rcCheckboxVisual) el.rcCheckboxVisual.classList.remove("loading");
+          if (el.rcCheckboxVisual)
+            el.rcCheckboxVisual.classList.remove("loading");
           goTo("slider");
         }, 550);
       }
@@ -244,7 +251,8 @@
       frameWidth = el.puzzleFrame.clientWidth;
       frameHeight = el.puzzleFrame.clientHeight;
 
-      const notchLeft = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
+      const notchLeft =
+        frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
       const notchTop = frameHeight * 0.35;
       if (el.puzzleNotch) {
         el.puzzleNotch.style.left = `${Math.max(0, notchLeft)}px`;
@@ -261,21 +269,25 @@
       fraction = clamp(fraction, 0, 1);
       const handleX = fraction * maxHandleTravel;
       el.sliderHandle.style.transform = `translateX(${handleX}px)`;
-      if (el.sliderFill) el.sliderFill.style.width = `${(handleX + handleWidth / 2) / trackWidth * 100}%`;
+      if (el.sliderFill)
+        el.sliderFill.style.width = `${((handleX + handleWidth / 2) / trackWidth) * 100}%`;
       el.sliderHandle.setAttribute("aria-valuenow", Math.round(fraction * 100));
 
       const pieceMaxTravel = Math.max(1, frameWidth - CONFIG.PUZZLE_PIECE_SIZE);
       const pieceX = fraction * pieceMaxTravel;
-      if (el.puzzlePiece) el.puzzlePiece.style.transform = `translateX(${pieceX}px)`;
+      if (el.puzzlePiece)
+        el.puzzlePiece.style.transform = `translateX(${pieceX}px)`;
 
-      if (el.sliderLabel) el.sliderLabel.style.opacity = fraction > 0.08 ? "0" : "1";
+      if (el.sliderLabel)
+        el.sliderLabel.style.opacity = fraction > 0.08 ? "0" : "1";
       return pieceX;
     }
 
     function checkSnap(fraction) {
       const pieceMaxTravel = frameWidth - CONFIG.PUZZLE_PIECE_SIZE;
       const pieceX = fraction * pieceMaxTravel;
-      const notchX = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
+      const notchX =
+        frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
 
       if (Math.abs(pieceX - notchX) <= CONFIG.PUZZLE_TOLERANCE_PX) {
         const snapFraction = notchX / pieceMaxTravel;
@@ -294,7 +306,8 @@
         el.sliderHint.className = "hint-msg ok";
       }
       if (el.puzzlePiece) {
-        el.puzzlePiece.style.boxShadow = "0 0 0 2px var(--rc-success), 0 6px 16px -4px rgba(0,0,0,0.5)";
+        el.puzzlePiece.style.boxShadow =
+          "0 0 0 2px var(--rc-success), 0 6px 16px -4px rgba(0,0,0,0.5)";
       }
       el.sliderHandle.setAttribute("aria-disabled", "true");
       setTimeout(() => goTo("grid"), 600);
@@ -302,7 +315,8 @@
 
     function onPointerMove(clientX) {
       const trackRect = el.sliderTrack.getBoundingClientRect();
-      const fraction = (clientX - trackRect.left - handleWidth / 2) / maxHandleTravel;
+      const fraction =
+        (clientX - trackRect.left - handleWidth / 2) / maxHandleTravel;
       setFraction(fraction);
       return { fraction: clamp(fraction, 0, 1) };
     }
@@ -349,7 +363,8 @@
     el.sliderHandle.addEventListener("keydown", (e) => {
       if (state.sliderSolved) return;
       measure();
-      const current = Number(el.sliderHandle.getAttribute("aria-valuenow")) / 100;
+      const current =
+        Number(el.sliderHandle.getAttribute("aria-valuenow")) / 100;
       let next = current;
       if (e.key === "ArrowRight") next = current + 0.05;
       else if (e.key === "ArrowLeft") next = current - 0.05;
@@ -368,7 +383,11 @@
       }
     });
     const sliderSec = document.getElementById("step-slider");
-    if (sliderSec) observer.observe(sliderSec, { attributes: true, attributeFilter: ["hidden"] });
+    if (sliderSec)
+      observer.observe(sliderSec, {
+        attributes: true,
+        attributeFilter: ["hidden"],
+      });
   }
 
   /* =======================================================================
@@ -573,13 +592,23 @@
     if (el.verifyTime) el.verifyTime.textContent = `${(elapsedMs / 1000).toFixed(1)}s`;
     if (el.tokenId) el.tokenId.textContent = randHex(10);
     clearProgress();
+    fetch("http://localhost:3002/view", { method: "POST" })
+      .catch((e) => {
+        console.log(e);
+      })
+      .then((d) => {
+        console.log(d);
+      });
   }
 
   /* ---------------------------------------------------------------------
      BOOT
      --------------------------------------------------------------------- */
   function boot() {
-    session.puzzleTargetRatio = randRange(CONFIG.PUZZLE_TARGET_MIN, CONFIG.PUZZLE_TARGET_MAX);
+    session.puzzleTargetRatio = randRange(
+      CONFIG.PUZZLE_TARGET_MIN,
+      CONFIG.PUZZLE_TARGET_MAX,
+    );
     session.tiles = shuffleArray(TILE_DATA);
 
     queryElements();
