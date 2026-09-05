@@ -31,18 +31,13 @@
     STORAGE_KEY: "edgegate_verify_progress_v1",
   };
 
-  // Telemetry copy shown in the step-4 console.
-  const LOG_LINES = [
-    "Connecting to event session…",
-    "Session fingerprint confirmed",
-    "Synchronizing attendee key…",
-    "Verifying room check-in (1/3)",
-    "Verifying room check-in (2/3)",
-    "Verifying room check-in (3/3)",
-    "Confirming auditorium attendance",
-    "Aggregating peer tokens…",
-    "Establishing verified channel",
-    "Provisioning stage access pass",
+  // Dynamic verification stages for Step 4
+  const VERIFICATION_PHASES = [
+    { threshold: 0,  label: "Validating session integrity…", sub: "Session fingerprint confirmed" },
+    { threshold: 25, label: "Analyzing security handshake…", sub: "Establishing encrypted channel" },
+    { threshold: 52, label: "Verifying cryptographic token…", sub: "Cross-referencing attestation key" },
+    { threshold: 78, label: "Confirming human attestation…", sub: "Generating access clearance" },
+    { threshold: 98, label: "Authorization confirmed ✓", sub: "Access granted" },
   ];
 
   // Real photo grid items for Step 3 (Select all images with bicycles)
@@ -108,8 +103,10 @@
       // step 4
       ringFg: document.getElementById("ringFg"),
       ringPct: document.getElementById("ringPct"),
+      linearBar: document.getElementById("linearBar"),
       loaderStatus: document.getElementById("loaderStatus"),
-      logConsole: document.getElementById("logConsole"),
+      phaseText: document.getElementById("phaseText"),
+      pulseDot: document.querySelector(".pulse-dot"),
 
       // step 5
       verifyTime: document.getElementById("verifyTime"),
@@ -454,63 +451,64 @@
      ======================================================================= */
   const RING_CIRCUMFERENCE = 2 * Math.PI * 44;
 
-  function setRingProgress(pct) {
-    if (!el.ringFg || !el.ringPct) return;
-    const offset = RING_CIRCUMFERENCE * (1 - pct / 100);
-    el.ringFg.style.strokeDashoffset = String(offset);
-    el.ringPct.textContent = `${Math.round(pct)}%`;
+  function setProgress(pct) {
+    if (el.ringFg && el.ringPct) {
+      const offset = RING_CIRCUMFERENCE * (1 - pct / 100);
+      el.ringFg.style.strokeDashoffset = String(offset);
+      el.ringPct.textContent = `${Math.round(pct)}%`;
+    }
+    if (el.linearBar) {
+      el.linearBar.style.width = `${Math.round(pct)}%`;
+    }
   }
 
-  function appendLogLine(text, isOk) {
-    if (!el.logConsole) return;
-    const line = document.createElement("div");
-    line.className = "log-line";
-    line.innerHTML = isOk ? `<span class="ok">✓</span> ${text}` : text;
-    el.logConsole.appendChild(line);
-
-    while (el.logConsole.children.length > 5) {
-      el.logConsole.removeChild(el.logConsole.firstChild);
+  function updatePhaseText(pct) {
+    let currentPhase = VERIFICATION_PHASES[0];
+    for (let i = VERIFICATION_PHASES.length - 1; i >= 0; i--) {
+      if (pct >= VERIFICATION_PHASES[i].threshold) {
+        currentPhase = VERIFICATION_PHASES[i];
+        break;
+      }
+    }
+    if (el.phaseText && el.phaseText.textContent !== currentPhase.label) {
+      el.phaseText.textContent = currentPhase.label;
+    }
+    if (el.loaderStatus && el.loaderStatus.textContent !== currentPhase.sub) {
+      el.loaderStatus.textContent = currentPhase.sub;
     }
   }
 
   function runLoader() {
-    if (el.logConsole) el.logConsole.innerHTML = "";
-    setRingProgress(0);
-    if (el.loaderStatus) el.loaderStatus.textContent = "Initializing…";
+    setProgress(0);
+    updatePhaseText(0);
+    if (el.pulseDot) {
+      el.pulseDot.style.background = "var(--rc-blue)";
+      el.pulseDot.style.boxShadow = "";
+    }
 
     let pct = 0;
-    let logIndex = 0;
     const target = CONFIG.LOADER_TARGET_PCT;
 
     const tick = setInterval(() => {
       const remaining = target - pct;
       const step = Math.max(0.4, remaining * 0.045);
       pct = Math.min(target, pct + step);
-      setRingProgress(pct);
+      setProgress(pct);
+      updatePhaseText(pct);
 
       if (pct >= target) {
         clearInterval(tick);
-        if (el.loaderStatus) el.loaderStatus.textContent = "Check-in verified";
         setTimeout(() => {
-          setRingProgress(100);
-          appendLogLine("Verification complete", true);
+          setProgress(100);
+          updatePhaseText(100);
+          if (el.pulseDot) {
+            el.pulseDot.style.background = "var(--rc-success)";
+            el.pulseDot.style.boxShadow = "0 0 0 5px rgba(30, 142, 62, 0.25)";
+          }
           setTimeout(() => goTo("success"), CONFIG.LOADER_FINAL_JUMP_MS);
         }, 350);
       }
     }, CONFIG.LOADER_TICK_MS);
-
-    const logTick = setInterval(() => {
-      if (logIndex >= LOG_LINES.length || pct >= target) {
-        clearInterval(logTick);
-        return;
-      }
-      appendLogLine(LOG_LINES[logIndex]);
-      logIndex += 1;
-      if (el.loaderStatus) {
-        if (logIndex <= 3) el.loaderStatus.textContent = LOG_LINES[logIndex - 1];
-        else el.loaderStatus.textContent = "Synchronizing attendee access…";
-      }
-    }, CONFIG.LOADER_LOG_INTERVAL_MS);
   }
 
   /* =======================================================================
@@ -535,11 +533,16 @@
     initStep2();
     initStep3();
 
-    const resumed = loadProgress();
-    if (resumed && resumed !== "loading" && resumed !== "success" && resumed !== "intro") {
-      state.step = resumed;
+    const hash = window.location.hash.replace("#", "");
+    if (STEPS.includes(hash)) {
+      goTo(hash);
+    } else {
+      const resumed = loadProgress();
+      if (resumed && resumed !== "loading" && resumed !== "success" && resumed !== "intro") {
+        state.step = resumed;
+      }
+      render();
     }
-    render();
   }
 
   if (document.readyState === "loading") {

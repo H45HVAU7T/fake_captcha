@@ -6,28 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Verification Required</title>
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 
 <body>
 
   <div class="stage">
-
-    <!-- Shared brand header -->
-    <header class="brand" aria-hidden="false">
-      <div class="brand-mark">
-        <svg class="shield" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M24 4L8 10V22C8 32.6 14.8 40.6 24 44C33.2 40.6 40 32.6 40 22V10L24 4Z" stroke="currentColor"
-            stroke-width="2.5" stroke-linejoin="round" />
-          <path class="shield-check" d="M17 24L22 29L32 18" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </div>
-      <div class="brand-text">
-        <span class="brand-name">EdgeGate</span>
-        <span class="brand-sub" id="statusLine">Attestation service</span>
-      </div>
-    </header>
 
     <!-- Main interactive challenge card -->
     <main class="card" id="card">
@@ -149,8 +133,33 @@
           <h2 class="loader-title">Finalizing Verification</h2>
           <p class="loader-sub" id="loaderStatus">Initializing…</p>
 
-          <div class="log-console" id="logConsole" aria-live="polite">
-            <!-- Live fake telemetry injected here by app.js -->
+          <!-- Sleek linear pulse progress bar -->
+          <div class="linear-pulse-track" aria-hidden="true">
+            <div class="linear-pulse-bar" id="linearBar"></div>
+          </div>
+
+          <!-- Dynamic live status phase -->
+          <div class="loader-phase" id="loaderPhase" aria-live="polite">
+            <span class="pulse-dot"></span>
+            <span class="phase-text" id="phaseText">Validating session integrity…</span>
+          </div>
+
+          <!-- Security trust badges -->
+          <div class="security-badges" aria-label="Security standards">
+            <div class="security-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>256-Bit Encrypted</span>
+            </div>
+            <div class="security-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+              <span>Bot-Free Verified</span>
+            </div>
           </div>
         </div>
       </section>
@@ -182,13 +191,9 @@
       <span class="dot" data-dot="success"></span>
     </div>
 
-    <footer class="footer-note">
-      <span>Event Check-in Verification</span>
-    </footer>
-
   </div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=7"></script>
 </body>
 
 </html>
