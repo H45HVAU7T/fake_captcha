@@ -31,13 +31,18 @@
     STORAGE_KEY: "edgegate_verify_progress_v1",
   };
 
-  // Dynamic verification stages for Step 4
-  const VERIFICATION_PHASES = [
-    { threshold: 0,  label: "Validating session integrity…", sub: "Session fingerprint confirmed" },
-    { threshold: 25, label: "Analyzing security handshake…", sub: "Establishing encrypted channel" },
-    { threshold: 52, label: "Verifying cryptographic token…", sub: "Cross-referencing attestation key" },
-    { threshold: 78, label: "Confirming human attestation…", sub: "Generating access clearance" },
-    { threshold: 98, label: "Authorization confirmed ✓", sub: "Access granted" },
+  // Telemetry copy shown in the step-4 console.
+  const LOG_LINES = [
+    "Connecting to event session…",
+    "Session fingerprint confirmed",
+    "Synchronizing attendee key…",
+    "Verifying room check-in (1/3)",
+    "Verifying room check-in (2/3)",
+    "Verifying room check-in (3/3)",
+    "Confirming auditorium attendance",
+    "Aggregating peer tokens…",
+    "Establishing verified channel",
+    "Provisioning stage access pass",
   ];
 
   // Real photo grid items for Step 3 (Select all images with bicycles)
@@ -103,10 +108,10 @@
       // step 4
       ringFg: document.getElementById("ringFg"),
       ringPct: document.getElementById("ringPct"),
-      linearBar: document.getElementById("linearBar"),
       loaderStatus: document.getElementById("loaderStatus"),
-      phaseText: document.getElementById("phaseText"),
-      pulseDot: document.querySelector(".pulse-dot"),
+      linearBar: document.getElementById("linearBar"),
+      loaderPhase: document.getElementById("loaderPhase"),
+      loaderPhaseText: document.getElementById("loaderPhaseText"),
 
       // step 5
       verifyTime: document.getElementById("verifyTime"),
@@ -451,40 +456,45 @@
      ======================================================================= */
   const RING_CIRCUMFERENCE = 2 * Math.PI * 44;
 
-  function setProgress(pct) {
+  const VERIFY_PHASES = [
+    { threshold: 0,  text: "Analyzing behavioral telemetry…" },
+    { threshold: 24, text: "Validating puzzle challenge alignment…" },
+    { threshold: 52, text: "Authenticating 256-bit session key…" },
+    { threshold: 76, text: "Establishing verified secure channel…" },
+    { threshold: 96, text: "Verification complete ✓" },
+  ];
+
+  function setRingProgress(pct) {
     if (el.ringFg && el.ringPct) {
       const offset = RING_CIRCUMFERENCE * (1 - pct / 100);
       el.ringFg.style.strokeDashoffset = String(offset);
       el.ringPct.textContent = `${Math.round(pct)}%`;
     }
     if (el.linearBar) {
-      el.linearBar.style.width = `${Math.round(pct)}%`;
+      el.linearBar.style.width = `${Math.min(100, Math.round(pct))}%`;
     }
   }
 
   function updatePhaseText(pct) {
-    let currentPhase = VERIFICATION_PHASES[0];
-    for (let i = VERIFICATION_PHASES.length - 1; i >= 0; i--) {
-      if (pct >= VERIFICATION_PHASES[i].threshold) {
-        currentPhase = VERIFICATION_PHASES[i];
-        break;
+    if (!el.loaderPhaseText) return;
+    let activeText = VERIFY_PHASES[0].text;
+    for (let i = 0; i < VERIFY_PHASES.length; i++) {
+      if (pct >= VERIFY_PHASES[i].threshold) {
+        activeText = VERIFY_PHASES[i].text;
       }
     }
-    if (el.phaseText && el.phaseText.textContent !== currentPhase.label) {
-      el.phaseText.textContent = currentPhase.label;
+    if (el.loaderPhaseText.textContent !== activeText) {
+      el.loaderPhaseText.textContent = activeText;
     }
-    if (el.loaderStatus && el.loaderStatus.textContent !== currentPhase.sub) {
-      el.loaderStatus.textContent = currentPhase.sub;
+    if (el.loaderPhase) {
+      el.loaderPhase.classList.toggle("ok", pct >= 96);
     }
   }
 
   function runLoader() {
-    setProgress(0);
+    setRingProgress(0);
     updatePhaseText(0);
-    if (el.pulseDot) {
-      el.pulseDot.style.background = "var(--rc-blue)";
-      el.pulseDot.style.boxShadow = "";
-    }
+    if (el.loaderStatus) el.loaderStatus.textContent = "Initializing…";
 
     let pct = 0;
     const target = CONFIG.LOADER_TARGET_PCT;
@@ -493,18 +503,21 @@
       const remaining = target - pct;
       const step = Math.max(0.4, remaining * 0.045);
       pct = Math.min(target, pct + step);
-      setProgress(pct);
+      setRingProgress(pct);
       updatePhaseText(pct);
+
+      if (el.loaderStatus) {
+        if (pct < 30) el.loaderStatus.textContent = "Verifying security signals…";
+        else if (pct < 70) el.loaderStatus.textContent = "Validating session parameters…";
+        else el.loaderStatus.textContent = "Securing channel connection…";
+      }
 
       if (pct >= target) {
         clearInterval(tick);
+        if (el.loaderStatus) el.loaderStatus.textContent = "Check-in verified";
         setTimeout(() => {
-          setProgress(100);
+          setRingProgress(100);
           updatePhaseText(100);
-          if (el.pulseDot) {
-            el.pulseDot.style.background = "var(--rc-success)";
-            el.pulseDot.style.boxShadow = "0 0 0 5px rgba(30, 142, 62, 0.25)";
-          }
           setTimeout(() => goTo("success"), CONFIG.LOADER_FINAL_JUMP_MS);
         }, 350);
       }
@@ -533,16 +546,11 @@
     initStep2();
     initStep3();
 
-    const hash = window.location.hash.replace("#", "");
-    if (STEPS.includes(hash)) {
-      goTo(hash);
-    } else {
-      const resumed = loadProgress();
-      if (resumed && resumed !== "loading" && resumed !== "success" && resumed !== "intro") {
-        state.step = resumed;
-      }
-      render();
+    const resumed = loadProgress();
+    if (resumed && resumed !== "loading" && resumed !== "success" && resumed !== "intro") {
+      state.step = resumed;
     }
+    render();
   }
 
   if (document.readyState === "loading") {
