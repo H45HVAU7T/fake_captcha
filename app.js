@@ -359,6 +359,21 @@
       onDragEnd(0);
     });
 
+    // A track tap is a useful mobile fallback when dragging the small handle
+    // is difficult. Handle drags continue to use the pointer handlers above.
+    el.sliderTrack.addEventListener("click", (e) => {
+      if (state.sliderSolved || el.sliderHandle.contains(e.target)) return;
+      measure();
+      const trackRect = el.sliderTrack.getBoundingClientRect();
+      const fraction = clamp(
+        (e.clientX - trackRect.left - handleWidth / 2) / maxHandleTravel,
+        0,
+        1,
+      );
+      setFraction(fraction);
+      checkSnap(fraction);
+    });
+
     // Keyboard support
     el.sliderHandle.addEventListener("keydown", (e) => {
       if (state.sliderSolved) return;
