@@ -68,6 +68,9 @@
     sliderSolved: false,
     gridSelected: new Set(),
     startTime: null,
+    loaderPct: 0,
+    gridReady: false,
+    gridSolved: false,
   };
 
   const session = {
@@ -139,7 +142,9 @@
 
   function saveProgress() {
     try {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({ step: state.step }));
+      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({
+        step: state.step, startTime: state.startTime, loaderPct: state.loaderPct,
+      }));
     } catch (e) {}
   }
 
@@ -148,7 +153,7 @@
       const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (STEPS.includes(parsed.step)) return parsed.step;
+      if (parsed && STEPS.includes(parsed.step)) return parsed;
     } catch (e) {}
     return null;
   }
@@ -205,7 +210,7 @@
 
     el.humanCheck.addEventListener("change", () => {
       if (el.humanCheck.checked) {
-        state.startTime = performance.now();
+        state.startTime = Date.now();
 
         // Show realistic spinner inside checkbox
         if (el.rcCheckboxVisual) el.rcCheckboxVisual.classList.add("loading");
@@ -373,25 +378,47 @@
     if (!el.grid3) return;
     el.grid3.innerHTML = "";
     state.gridSelected.clear();
+    state.gridReady = false;
+    state.gridSolved = false;
+    let loaded = 0;
+    let failed = false;
+    const buttons = [];
+    const updateImages = () => {
+      if (!buttons[0]?.isConnected) return;
+      state.gridReady = loaded === session.tiles.length && !failed;
+      buttons.forEach((button) => { button.disabled = !state.gridReady; });
+      if (el.gridHint) {
+        el.gridHint.textContent = failed
+          ? "Images could not load. Use the reload button to retry."
+          : state.gridReady ? "" : "Loading puzzle images…";
+        el.gridHint.className = failed ? "hint-msg error" : "hint-msg";
+      }
+    };
 
     session.tiles.forEach((tile, i) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "tile";
+      btn.disabled = true;
+      buttons.push(btn);
       btn.dataset.index = String(i);
       btn.setAttribute("aria-pressed", "false");
-      btn.setAttribute("aria-label", tile.label);
+      btn.setAttribute("aria-label", `Puzzle tile ${i + 1}`);
       btn.innerHTML = `
-        <img class="tile-img" src="${tile.src}" alt="${tile.label}" loading="eager" draggable="false">
+        <img class="tile-img" alt="" loading="eager" draggable="false">
         <span class="tile-check">✓</span>
       `;
+      const img = btn.querySelector("img");
+      img.addEventListener("load", () => { loaded++; updateImages(); }, { once: true });
+      img.addEventListener("error", () => { failed = true; updateImages(); }, { once: true });
+      img.src = tile.src;
       btn.addEventListener("click", () => toggleTile(i, btn));
       el.grid3.appendChild(btn);
     });
 
     if (el.btnConfirmGrid) el.btnConfirmGrid.disabled = true;
     if (el.gridHint) {
-      el.gridHint.textContent = "";
+      el.gridHint.textContent = "Loading puzzle images…";
       el.gridHint.className = "hint-msg";
     }
   }
@@ -405,6 +432,7 @@
 
     if (el.btnReloadGrid) {
       el.btnReloadGrid.addEventListener("click", () => {
+        if (state.gridSolved) return;
         session.tiles = shuffleArray(TILE_DATA);
         renderGridTiles();
       });
@@ -412,6 +440,7 @@
   }
 
   function toggleTile(index, btn) {
+    if (!state.gridReady || state.gridSolved) return;
     if (state.gridSelected.has(index)) {
       state.gridSelected.delete(index);
       btn.classList.remove("selected");
@@ -432,12 +461,16 @@
   }
 
   function confirmGrid() {
+    if (!state.gridReady || state.gridSolved) return;
     const totalTargets = session.tiles.filter((t) => t.isTarget).length;
     const correctCount = session.tiles.filter((t, i) => t.isTarget && state.gridSelected.has(i)).length;
     const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].isTarget).length;
 
     // Passing condition: all 4 target BNM auditorium images selected and zero wrong selections
     if (correctCount === totalTargets && wrongCount === 0) {
+      state.gridSolved = true;
+      el.grid3.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+      if (el.btnReloadGrid) el.btnReloadGrid.disabled = true;
       if (el.gridHint) {
         el.gridHint.textContent = "Verification confirmed ✓";
         el.gridHint.className = "hint-msg ok";
@@ -498,17 +531,19 @@
   }
 
   function runLoader() {
-    setRingProgress(0);
-    updatePhaseText(0);
+    setRingProgress(state.loaderPct);
+    updatePhaseText(state.loaderPct);
     if (el.loaderStatus) el.loaderStatus.textContent = "Initializing…";
 
-    let pct = 0;
+    let pct = state.loaderPct;
     const target = CONFIG.LOADER_TARGET_PCT;
 
     const tick = setInterval(() => {
       const remaining = target - pct;
       const step = Math.max(0.4, remaining * 0.045);
       pct = Math.min(target, pct + step);
+      state.loaderPct = pct;
+      saveProgress();
       setRingProgress(pct);
       updatePhaseText(pct);
 
@@ -534,7 +569,7 @@
      STEP 5 — Success Screen
      ======================================================================= */
   function finishSuccess() {
-    const elapsedMs = state.startTime ? performance.now() - state.startTime : 0;
+    const elapsedMs = state.startTime ? Math.max(0, Date.now() - state.startTime) : 0;
     if (el.verifyTime) el.verifyTime.textContent = `${(elapsedMs / 1000).toFixed(1)}s`;
     if (el.tokenId) el.tokenId.textContent = randHex(10);
     clearProgress();
@@ -553,8 +588,13 @@
     initStep3();
 
     const resumed = loadProgress();
-    if (resumed && resumed !== "loading" && resumed !== "success" && resumed !== "intro") {
-      state.step = resumed;
+    if (resumed && resumed.step !== "intro") {
+      state.startTime = Number.isFinite(resumed.startTime) && resumed.startTime > 0
+        && resumed.startTime <= Date.now() ? resumed.startTime : Date.now();
+      state.loaderPct = Number.isFinite(resumed.loaderPct)
+        ? clamp(resumed.loaderPct, 0, CONFIG.LOADER_TARGET_PCT) : 0;
+      goTo(resumed.step);
+      return;
     }
     render();
   }

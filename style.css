@@ -835,3 +835,20 @@ body {
   max-width: 320px;
   line-height: 1.4;
 }
+
+.tile:disabled {
+  cursor: default;
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--rc-blue);
+  outline-offset: -3px;
+}
+
+.rc-button:focus-visible,
+.rc-icon-btn:focus-visible,
+.slider-handle:focus-visible,
+.rc-anchor-checkbox-label input:focus-visible + .rc-checkbox {
+  outline: 3px solid #174ea6;
+  outline-offset: 3px;
+}
