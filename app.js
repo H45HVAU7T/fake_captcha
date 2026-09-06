@@ -18,8 +18,8 @@
     PUZZLE_TOLERANCE_PX: 14,     // how close the piece must land to the notch to "snap"
     PUZZLE_PIECE_SIZE: 44,       // must match .puzzle-piece / .puzzle-notch width in CSS
 
-    // Step 3 grid puzzle — minimum correct bicycle tiles the user must pick
-    GRID_REQUIRED_CORRECT: 3,
+    // Step 3 grid puzzle — require all 4 correct BNM auditorium images
+    GRID_REQUIRED_CORRECT: 4,
 
     // Step 4 fake loader
     LOADER_TARGET_PCT: 92,       // loader climbs to this, never quite hits 100 on its own
@@ -45,17 +45,17 @@
     "Provisioning stage access pass",
   ];
 
-  // Real photo grid items for Step 3 (Select all images with bicycles)
+  // Real photo grid items for Step 3 (Auditoriums - BNM Auditorium target)
   const TILE_DATA = [
-    { label: "Road Bicycle",       isTarget: true,  src: "assets/tile-bike-1.webp" },
-    { label: "Sedan Car",          isTarget: false, src: "assets/tile-car.webp" },
-    { label: "Vintage Bicycle",    isTarget: true,  src: "assets/tile-bike-2.webp" },
-    { label: "Traffic",            isTarget: false, src: "assets/tile-traffic.webp" },
-    { label: "City Bicycle",       isTarget: true,  src: "assets/tile-bike-3.webp" },
-    { label: "City Bus",           isTarget: false, src: "assets/tile-bus.webp" },
-    { label: "Fire Hydrant",       isTarget: false, src: "assets/tile-hydrant.webp" },
-    { label: "Motorcycle",         isTarget: false, src: "assets/tile-motor.webp" },
-    { label: "Mountain Bicycle",   isTarget: true,  src: "assets/tile-bike-4.webp" },
+    { label: "BNM Auditorium Stage & Seating", isTarget: true,  src: "assets/auditorium-bnm-1.webp" },
+    { label: "AIIMS Auditorium",               isTarget: false, src: "assets/auditorium-other-1.webp" },
+    { label: "BNM Auditorium Tiered Seating",  isTarget: true,  src: "assets/auditorium-bnm-2.webp" },
+    { label: "APS College Auditorium",         isTarget: false, src: "assets/auditorium-other-2.webp" },
+    { label: "BNM Auditorium Audience Cheer",  isTarget: true,  src: "assets/auditorium-bnm-3.webp" },
+    { label: "Modern Auditorium",              isTarget: false, src: "assets/auditorium-other-3.webp" },
+    { label: "JSS Wooden Auditorium",          isTarget: false, src: "assets/auditorium-other-4.webp" },
+    { label: "BNM Auditorium Ceremony Stage",  isTarget: true,  src: "assets/auditorium-bnm-4.webp" },
+    { label: "Auditorium Hall Seating",        isTarget: false, src: "assets/auditorium-other-5.webp" },
   ];
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];
@@ -367,7 +367,7 @@
   }
 
   /* =======================================================================
-     STEP 3 — 3x3 Real Photo Grid Challenge (Bicycles)
+     STEP 3 — 3x3 Real Photo Grid Challenge (BNM Auditorium)
      ======================================================================= */
   function renderGridTiles() {
     if (!el.grid3) return;
@@ -432,11 +432,12 @@
   }
 
   function confirmGrid() {
+    const totalTargets = session.tiles.filter((t) => t.isTarget).length;
     const correctCount = session.tiles.filter((t, i) => t.isTarget && state.gridSelected.has(i)).length;
     const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].isTarget).length;
 
-    // Passing condition: at least 3 bicycles selected and zero wrong selections
-    if (correctCount >= CONFIG.GRID_REQUIRED_CORRECT && wrongCount === 0) {
+    // Passing condition: all 4 target BNM auditorium images selected and zero wrong selections
+    if (correctCount === totalTargets && wrongCount === 0) {
       if (el.gridHint) {
         el.gridHint.textContent = "Verification confirmed ✓";
         el.gridHint.className = "hint-msg ok";
@@ -444,8 +445,13 @@
       if (el.btnConfirmGrid) el.btnConfirmGrid.disabled = true;
       setTimeout(() => goTo("loading"), 500);
     } else {
+      if (el.grid3) {
+        el.grid3.classList.remove("shake");
+        void el.grid3.offsetWidth;
+        el.grid3.classList.add("shake");
+      }
       if (el.gridHint) {
-        el.gridHint.textContent = "Please select all squares with bicycles and retry.";
+        el.gridHint.textContent = "Please select all squares with BNM auditorium and retry.";
         el.gridHint.className = "hint-msg error";
       }
     }
