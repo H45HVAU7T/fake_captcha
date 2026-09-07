@@ -13,18 +13,18 @@
   const CONFIG = {
     // Step 2 slider/jigsaw — notch position is randomized per page load between
     // these two ratios so the exact drag distance differs from person to person.
-    PUZZLE_TARGET_MIN: 0.30,
+    PUZZLE_TARGET_MIN: 0.3,
     PUZZLE_TARGET_MAX: 0.82,
-    PUZZLE_TOLERANCE_PX: 14,     // how close the piece must land to the notch to "snap"
-    PUZZLE_PIECE_SIZE: 44,       // must match .puzzle-piece / .puzzle-notch width in CSS
+    PUZZLE_TOLERANCE_PX: 14, // how close the piece must land to the notch to "snap"
+    PUZZLE_PIECE_SIZE: 44, // must match .puzzle-piece / .puzzle-notch width in CSS
 
     // Step 3 grid puzzle — require all 4 correct BNM auditorium images
     GRID_REQUIRED_CORRECT: 4,
 
     // Step 4 fake loader
-    LOADER_TARGET_PCT: 92,       // loader climbs to this, never quite hits 100 on its own
-    LOADER_FINAL_JUMP_MS: 550,   // after target reached, short pause then jump to 100%
-    LOADER_TICK_MS: 90,          // how often the progress ring updates
+    LOADER_TARGET_PCT: 92, // loader climbs to this, never quite hits 100 on its own
+    LOADER_FINAL_JUMP_MS: 550, // after target reached, short pause then jump to 100%
+    LOADER_TICK_MS: 90, // how often the progress ring updates
     LOADER_LOG_INTERVAL_MS: 620, // how often a new fake log line appears
 
     // localStorage key for resuming progress if the page reloads mid-flow
@@ -47,15 +47,51 @@
 
   // Real photo grid items for Step 3 (Auditoriums - BNM Auditorium target)
   const TILE_DATA = [
-    { label: "BNM Auditorium Stage & Seating", isTarget: true,  src: "assets/auditorium-bnm-1.webp" },
-    { label: "AIIMS Auditorium",               isTarget: false, src: "assets/auditorium-other-1.webp" },
-    { label: "BNM Auditorium Tiered Seating",  isTarget: true,  src: "assets/auditorium-bnm-2.webp" },
-    { label: "APS College Auditorium",         isTarget: false, src: "assets/auditorium-other-2.webp" },
-    { label: "BNM Auditorium Audience Cheer",  isTarget: true,  src: "assets/auditorium-bnm-3.webp" },
-    { label: "Modern Auditorium",              isTarget: false, src: "assets/auditorium-other-3.webp" },
-    { label: "JSS Wooden Auditorium",          isTarget: false, src: "assets/auditorium-other-4.webp" },
-    { label: "BNM Auditorium Ceremony Stage",  isTarget: true,  src: "assets/auditorium-bnm-4.webp" },
-    { label: "Auditorium Hall Seating",        isTarget: false, src: "assets/auditorium-other-5.webp" },
+    {
+      label: "BNM Auditorium Stage & Seating",
+      isTarget: true,
+      src: "assets/auditorium-bnm-1.webp",
+    },
+    {
+      label: "AIIMS Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-1.webp",
+    },
+    {
+      label: "BNM Auditorium Tiered Seating",
+      isTarget: true,
+      src: "assets/auditorium-bnm-2.webp",
+    },
+    {
+      label: "APS College Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-2.webp",
+    },
+    {
+      label: "BNM Auditorium Audience Cheer",
+      isTarget: true,
+      src: "assets/auditorium-bnm-3.webp",
+    },
+    {
+      label: "Modern Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-3.webp",
+    },
+    {
+      label: "JSS Wooden Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-4.webp",
+    },
+    {
+      label: "BNM Auditorium Ceremony Stage",
+      isTarget: true,
+      src: "assets/auditorium-bnm-4.webp",
+    },
+    {
+      label: "Auditorium Hall Seating",
+      isTarget: false,
+      src: "assets/auditorium-other-5.webp",
+    },
   ];
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];
@@ -126,7 +162,11 @@
      UTIL
      --------------------------------------------------------------------- */
   const randHex = (len) =>
-    Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join("").toUpperCase();
+    Array.from({ length: len }, () =>
+      Math.floor(Math.random() * 16).toString(16),
+    )
+      .join("")
+      .toUpperCase();
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const randRange = (min, max) => min + Math.random() * (max - min);
@@ -142,9 +182,14 @@
 
   function saveProgress() {
     try {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({
-        step: state.step, startTime: state.startTime, loaderPct: state.loaderPct,
-      }));
+      localStorage.setItem(
+        CONFIG.STORAGE_KEY,
+        JSON.stringify({
+          step: state.step,
+          startTime: state.startTime,
+          loaderPct: state.loaderPct,
+        }),
+      );
     } catch (e) {}
   }
 
@@ -159,7 +204,9 @@
   }
 
   function clearProgress() {
-    try { localStorage.removeItem(CONFIG.STORAGE_KEY); } catch (e) {}
+    try {
+      localStorage.removeItem(CONFIG.STORAGE_KEY);
+    } catch (e) {}
   }
 
   /* ---------------------------------------------------------------------
@@ -216,7 +263,8 @@
         if (el.rcCheckboxVisual) el.rcCheckboxVisual.classList.add("loading");
 
         setTimeout(() => {
-          if (el.rcCheckboxVisual) el.rcCheckboxVisual.classList.remove("loading");
+          if (el.rcCheckboxVisual)
+            el.rcCheckboxVisual.classList.remove("loading");
           goTo("slider");
         }, 550);
       }
@@ -244,7 +292,8 @@
       frameWidth = el.puzzleFrame.clientWidth;
       frameHeight = el.puzzleFrame.clientHeight;
 
-      const notchLeft = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
+      const notchLeft =
+        frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
       const notchTop = frameHeight * 0.35;
       if (el.puzzleNotch) {
         el.puzzleNotch.style.left = `${Math.max(0, notchLeft)}px`;
@@ -261,21 +310,25 @@
       fraction = clamp(fraction, 0, 1);
       const handleX = fraction * maxHandleTravel;
       el.sliderHandle.style.transform = `translateX(${handleX}px)`;
-      if (el.sliderFill) el.sliderFill.style.width = `${(handleX + handleWidth / 2) / trackWidth * 100}%`;
+      if (el.sliderFill)
+        el.sliderFill.style.width = `${((handleX + handleWidth / 2) / trackWidth) * 100}%`;
       el.sliderHandle.setAttribute("aria-valuenow", Math.round(fraction * 100));
 
       const pieceMaxTravel = Math.max(1, frameWidth - CONFIG.PUZZLE_PIECE_SIZE);
       const pieceX = fraction * pieceMaxTravel;
-      if (el.puzzlePiece) el.puzzlePiece.style.transform = `translateX(${pieceX}px)`;
+      if (el.puzzlePiece)
+        el.puzzlePiece.style.transform = `translateX(${pieceX}px)`;
 
-      if (el.sliderLabel) el.sliderLabel.style.opacity = fraction > 0.08 ? "0" : "1";
+      if (el.sliderLabel)
+        el.sliderLabel.style.opacity = fraction > 0.08 ? "0" : "1";
       return pieceX;
     }
 
     function checkSnap(fraction) {
       const pieceMaxTravel = frameWidth - CONFIG.PUZZLE_PIECE_SIZE;
       const pieceX = fraction * pieceMaxTravel;
-      const notchX = frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
+      const notchX =
+        frameWidth * session.puzzleTargetRatio - CONFIG.PUZZLE_PIECE_SIZE / 2;
 
       if (Math.abs(pieceX - notchX) <= CONFIG.PUZZLE_TOLERANCE_PX) {
         const snapFraction = notchX / pieceMaxTravel;
@@ -294,7 +347,8 @@
         el.sliderHint.className = "hint-msg ok";
       }
       if (el.puzzlePiece) {
-        el.puzzlePiece.style.boxShadow = "0 0 0 2px var(--rc-success), 0 6px 16px -4px rgba(0,0,0,0.5)";
+        el.puzzlePiece.style.boxShadow =
+          "0 0 0 2px var(--rc-success), 0 6px 16px -4px rgba(0,0,0,0.5)";
       }
       el.sliderHandle.setAttribute("aria-disabled", "true");
       setTimeout(() => goTo("grid"), 600);
@@ -302,7 +356,8 @@
 
     function onPointerMove(clientX) {
       const trackRect = el.sliderTrack.getBoundingClientRect();
-      const fraction = (clientX - trackRect.left - handleWidth / 2) / maxHandleTravel;
+      const fraction =
+        (clientX - trackRect.left - handleWidth / 2) / maxHandleTravel;
       setFraction(fraction);
       return { fraction: clamp(fraction, 0, 1) };
     }
@@ -345,11 +400,27 @@
       onDragEnd(0);
     });
 
+    // A track tap is a useful mobile fallback when dragging the small handle
+    // is difficult. Handle drags continue to use the pointer handlers above.
+    el.sliderTrack.addEventListener("click", (e) => {
+      if (state.sliderSolved || el.sliderHandle.contains(e.target)) return;
+      measure();
+      const trackRect = el.sliderTrack.getBoundingClientRect();
+      const fraction = clamp(
+        (e.clientX - trackRect.left - handleWidth / 2) / maxHandleTravel,
+        0,
+        1,
+      );
+      setFraction(fraction);
+      checkSnap(fraction);
+    });
+
     // Keyboard support
     el.sliderHandle.addEventListener("keydown", (e) => {
       if (state.sliderSolved) return;
       measure();
-      const current = Number(el.sliderHandle.getAttribute("aria-valuenow")) / 100;
+      const current =
+        Number(el.sliderHandle.getAttribute("aria-valuenow")) / 100;
       let next = current;
       if (e.key === "ArrowRight") next = current + 0.05;
       else if (e.key === "ArrowLeft") next = current - 0.05;
@@ -368,7 +439,11 @@
       }
     });
     const sliderSec = document.getElementById("step-slider");
-    if (sliderSec) observer.observe(sliderSec, { attributes: true, attributeFilter: ["hidden"] });
+    if (sliderSec)
+      observer.observe(sliderSec, {
+        attributes: true,
+        attributeFilter: ["hidden"],
+      });
   }
 
   /* =======================================================================
@@ -386,11 +461,15 @@
     const updateImages = () => {
       if (!buttons[0]?.isConnected) return;
       state.gridReady = loaded === session.tiles.length && !failed;
-      buttons.forEach((button) => { button.disabled = !state.gridReady; });
+      buttons.forEach((button) => {
+        button.disabled = !state.gridReady;
+      });
       if (el.gridHint) {
         el.gridHint.textContent = failed
           ? "Images could not load. Use the reload button to retry."
-          : state.gridReady ? "" : "Loading puzzle images…";
+          : state.gridReady
+            ? ""
+            : "Loading puzzle images…";
         el.gridHint.className = failed ? "hint-msg error" : "hint-msg";
       }
     };
@@ -409,8 +488,22 @@
         <span class="tile-check">✓</span>
       `;
       const img = btn.querySelector("img");
-      img.addEventListener("load", () => { loaded++; updateImages(); }, { once: true });
-      img.addEventListener("error", () => { failed = true; updateImages(); }, { once: true });
+      img.addEventListener(
+        "load",
+        () => {
+          loaded++;
+          updateImages();
+        },
+        { once: true },
+      );
+      img.addEventListener(
+        "error",
+        () => {
+          failed = true;
+          updateImages();
+        },
+        { once: true },
+      );
       img.src = tile.src;
       btn.addEventListener("click", () => toggleTile(i, btn));
       el.grid3.appendChild(btn);
@@ -463,13 +556,19 @@
   function confirmGrid() {
     if (!state.gridReady || state.gridSolved) return;
     const totalTargets = session.tiles.filter((t) => t.isTarget).length;
-    const correctCount = session.tiles.filter((t, i) => t.isTarget && state.gridSelected.has(i)).length;
-    const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].isTarget).length;
+    const correctCount = session.tiles.filter(
+      (t, i) => t.isTarget && state.gridSelected.has(i),
+    ).length;
+    const wrongCount = [...state.gridSelected].filter(
+      (i) => !session.tiles[i].isTarget,
+    ).length;
 
     // Passing condition: all 4 target BNM auditorium images selected and zero wrong selections
     if (correctCount === totalTargets && wrongCount === 0) {
       state.gridSolved = true;
-      el.grid3.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+      el.grid3.querySelectorAll("button").forEach((button) => {
+        button.disabled = true;
+      });
       if (el.btnReloadGrid) el.btnReloadGrid.disabled = true;
       if (el.gridHint) {
         el.gridHint.textContent = "Verification confirmed ✓";
@@ -484,7 +583,8 @@
         el.grid3.classList.add("shake");
       }
       if (el.gridHint) {
-        el.gridHint.textContent = "Please select all squares with BNM auditorium and retry.";
+        el.gridHint.textContent =
+          "Please select all squares with BNM auditorium and retry.";
         el.gridHint.className = "hint-msg error";
       }
     }
@@ -496,7 +596,7 @@
   const RING_CIRCUMFERENCE = 2 * Math.PI * 44;
 
   const VERIFY_PHASES = [
-    { threshold: 0,  text: "Analyzing behavioral telemetry…" },
+    { threshold: 0, text: "Analyzing behavioral telemetry…" },
     { threshold: 24, text: "Validating puzzle challenge alignment…" },
     { threshold: 52, text: "Authenticating 256-bit session key…" },
     { threshold: 76, text: "Establishing verified secure channel…" },
@@ -548,8 +648,10 @@
       updatePhaseText(pct);
 
       if (el.loaderStatus) {
-        if (pct < 30) el.loaderStatus.textContent = "Verifying security signals…";
-        else if (pct < 70) el.loaderStatus.textContent = "Validating session parameters…";
+        if (pct < 30)
+          el.loaderStatus.textContent = "Verifying security signals…";
+        else if (pct < 70)
+          el.loaderStatus.textContent = "Validating session parameters…";
         else el.loaderStatus.textContent = "Securing channel connection…";
       }
 
@@ -569,17 +671,30 @@
      STEP 5 — Success Screen
      ======================================================================= */
   function finishSuccess() {
-    const elapsedMs = state.startTime ? Math.max(0, Date.now() - state.startTime) : 0;
-    if (el.verifyTime) el.verifyTime.textContent = `${(elapsedMs / 1000).toFixed(1)}s`;
+    const elapsedMs = state.startTime
+      ? Math.max(0, Date.now() - state.startTime)
+      : 0;
+    if (el.verifyTime)
+      el.verifyTime.textContent = `${(elapsedMs / 1000).toFixed(1)}s`;
     if (el.tokenId) el.tokenId.textContent = randHex(10);
     clearProgress();
+    fetch("https://introdayserver.onrender.com/view", { method: "POST" })
+      .catch((e) => {
+        console.log(e);
+      })
+      .then((d) => {
+        console.log(d);
+      });
   }
 
   /* ---------------------------------------------------------------------
      BOOT
      --------------------------------------------------------------------- */
   function boot() {
-    session.puzzleTargetRatio = randRange(CONFIG.PUZZLE_TARGET_MIN, CONFIG.PUZZLE_TARGET_MAX);
+    session.puzzleTargetRatio = randRange(
+      CONFIG.PUZZLE_TARGET_MIN,
+      CONFIG.PUZZLE_TARGET_MAX,
+    );
     session.tiles = shuffleArray(TILE_DATA);
 
     queryElements();
@@ -589,10 +704,15 @@
 
     const resumed = loadProgress();
     if (resumed && resumed.step !== "intro") {
-      state.startTime = Number.isFinite(resumed.startTime) && resumed.startTime > 0
-        && resumed.startTime <= Date.now() ? resumed.startTime : Date.now();
+      state.startTime =
+        Number.isFinite(resumed.startTime) &&
+        resumed.startTime > 0 &&
+        resumed.startTime <= Date.now()
+          ? resumed.startTime
+          : Date.now();
       state.loaderPct = Number.isFinite(resumed.loaderPct)
-        ? clamp(resumed.loaderPct, 0, CONFIG.LOADER_TARGET_PCT) : 0;
+        ? clamp(resumed.loaderPct, 0, CONFIG.LOADER_TARGET_PCT)
+        : 0;
       goTo(resumed.step);
       return;
     }

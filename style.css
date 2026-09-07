@@ -36,7 +36,7 @@
 
 html,
 body {
-  min-height: 100vh;
+  min-height: 100%;
   margin: 0;
   background-color: var(--bg);
   color: #e7e9ee;
@@ -69,11 +69,15 @@ body {
   width: 100%;
   max-width: 440px;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  padding: calc(24px + env(safe-area-inset-top))
+    calc(16px + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    calc(16px + env(safe-area-inset-left));
   gap: 20px;
 }
 
@@ -123,6 +127,7 @@ body {
   cursor: pointer;
   user-select: none;
   position: relative;
+  min-height: 44px;
 }
 
 .rc-anchor-checkbox-label input {
@@ -331,8 +336,8 @@ body {
   position: absolute;
   left: 2px;
   top: 2px;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #ffffff;
   color: #5f6368;
@@ -493,6 +498,8 @@ body {
   background: none;
   border: none;
   padding: 0;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
   color: #70757a;
   display: flex;
@@ -533,6 +540,15 @@ body {
   background: #dadce0;
   color: #ffffff;
   cursor: not-allowed;
+}
+
+.rc-icon-btn:focus-visible,
+.rc-button:focus-visible,
+.tile:focus-visible,
+.slider-handle:focus-visible,
+.rc-anchor-checkbox-label:focus-within .rc-checkbox {
+  outline: 3px solid rgba(26, 115, 232, 0.55);
+  outline-offset: 2px;
 }
 
 .hint-msg {
@@ -836,19 +852,6 @@ body {
   line-height: 1.4;
 }
 
-.tile:disabled {
-  cursor: default;
-}
-
-.tile:focus-visible {
-  outline: 3px solid var(--rc-blue);
-  outline-offset: -3px;
-}
-
-.rc-button:focus-visible,
-.rc-icon-btn:focus-visible,
-.slider-handle:focus-visible,
-.rc-anchor-checkbox-label input:focus-visible + .rc-checkbox {
-  outline: 3px solid #174ea6;
-  outline-offset: 3px;
+@media (max-width: 600px), (pointer: coarse) {
+  body { background-attachment: scroll; }
 }
