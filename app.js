@@ -47,15 +47,51 @@
 
   // Real photo grid items for Step 3 (Auditoriums - BNM Auditorium target)
   const TILE_DATA = [
-    { label: "BNM Auditorium Stage & Seating", isTarget: true,  src: "assets/auditorium-bnm-1.webp" },
-    { label: "AIIMS Auditorium",               isTarget: false, src: "assets/auditorium-other-1.webp" },
-    { label: "BNM Auditorium Tiered Seating",  isTarget: true,  src: "assets/auditorium-bnm-2.webp" },
-    { label: "APS College Auditorium",         isTarget: false, src: "assets/auditorium-other-2.webp" },
-    { label: "BNM Auditorium Audience Cheer",  isTarget: true,  src: "assets/auditorium-bnm-3.webp" },
-    { label: "Modern Auditorium",              isTarget: false, src: "assets/auditorium-other-3.webp" },
-    { label: "JSS Wooden Auditorium",          isTarget: false, src: "assets/auditorium-other-4.webp" },
-    { label: "BNM Auditorium Ceremony Stage",  isTarget: true,  src: "assets/auditorium-bnm-4.webp" },
-    { label: "Auditorium Hall Seating",        isTarget: false, src: "assets/auditorium-other-5.webp" },
+    {
+      label: "BNM Auditorium Stage & Seating",
+      isTarget: true,
+      src: "assets/auditorium-bnm-1.webp",
+    },
+    {
+      label: "AIIMS Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-1.webp",
+    },
+    {
+      label: "BNM Auditorium Tiered Seating",
+      isTarget: true,
+      src: "assets/auditorium-bnm-2.webp",
+    },
+    {
+      label: "APS College Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-2.webp",
+    },
+    {
+      label: "BNM Auditorium Audience Cheer",
+      isTarget: true,
+      src: "assets/auditorium-bnm-3.webp",
+    },
+    {
+      label: "Modern Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-3.webp",
+    },
+    {
+      label: "JSS Wooden Auditorium",
+      isTarget: false,
+      src: "assets/auditorium-other-4.webp",
+    },
+    {
+      label: "BNM Auditorium Ceremony Stage",
+      isTarget: true,
+      src: "assets/auditorium-bnm-4.webp",
+    },
+    {
+      label: "Auditorium Hall Seating",
+      isTarget: false,
+      src: "assets/auditorium-other-5.webp",
+    },
   ];
 
   const STEPS = ["intro", "slider", "grid", "loading", "success"];
@@ -146,9 +182,14 @@
 
   function saveProgress() {
     try {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({
-        step: state.step, startTime: state.startTime, loaderPct: state.loaderPct,
-      }));
+      localStorage.setItem(
+        CONFIG.STORAGE_KEY,
+        JSON.stringify({
+          step: state.step,
+          startTime: state.startTime,
+          loaderPct: state.loaderPct,
+        }),
+      );
     } catch (e) {}
   }
 
@@ -420,11 +461,15 @@
     const updateImages = () => {
       if (!buttons[0]?.isConnected) return;
       state.gridReady = loaded === session.tiles.length && !failed;
-      buttons.forEach((button) => { button.disabled = !state.gridReady; });
+      buttons.forEach((button) => {
+        button.disabled = !state.gridReady;
+      });
       if (el.gridHint) {
         el.gridHint.textContent = failed
           ? "Images could not load. Use the reload button to retry."
-          : state.gridReady ? "" : "Loading puzzle images…";
+          : state.gridReady
+            ? ""
+            : "Loading puzzle images…";
         el.gridHint.className = failed ? "hint-msg error" : "hint-msg";
       }
     };
@@ -443,8 +488,22 @@
         <span class="tile-check">✓</span>
       `;
       const img = btn.querySelector("img");
-      img.addEventListener("load", () => { loaded++; updateImages(); }, { once: true });
-      img.addEventListener("error", () => { failed = true; updateImages(); }, { once: true });
+      img.addEventListener(
+        "load",
+        () => {
+          loaded++;
+          updateImages();
+        },
+        { once: true },
+      );
+      img.addEventListener(
+        "error",
+        () => {
+          failed = true;
+          updateImages();
+        },
+        { once: true },
+      );
       img.src = tile.src;
       btn.addEventListener("click", () => toggleTile(i, btn));
       el.grid3.appendChild(btn);
@@ -497,13 +556,19 @@
   function confirmGrid() {
     if (!state.gridReady || state.gridSolved) return;
     const totalTargets = session.tiles.filter((t) => t.isTarget).length;
-    const correctCount = session.tiles.filter((t, i) => t.isTarget && state.gridSelected.has(i)).length;
-    const wrongCount = [...state.gridSelected].filter((i) => !session.tiles[i].isTarget).length;
+    const correctCount = session.tiles.filter(
+      (t, i) => t.isTarget && state.gridSelected.has(i),
+    ).length;
+    const wrongCount = [...state.gridSelected].filter(
+      (i) => !session.tiles[i].isTarget,
+    ).length;
 
     // Passing condition: all 4 target BNM auditorium images selected and zero wrong selections
     if (correctCount === totalTargets && wrongCount === 0) {
       state.gridSolved = true;
-      el.grid3.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+      el.grid3.querySelectorAll("button").forEach((button) => {
+        button.disabled = true;
+      });
       if (el.btnReloadGrid) el.btnReloadGrid.disabled = true;
       if (el.gridHint) {
         el.gridHint.textContent = "Verification confirmed ✓";
@@ -518,7 +583,8 @@
         el.grid3.classList.add("shake");
       }
       if (el.gridHint) {
-        el.gridHint.textContent = "Please select all squares with BNM auditorium and retry.";
+        el.gridHint.textContent =
+          "Please select all squares with BNM auditorium and retry.";
         el.gridHint.className = "hint-msg error";
       }
     }
@@ -530,7 +596,7 @@
   const RING_CIRCUMFERENCE = 2 * Math.PI * 44;
 
   const VERIFY_PHASES = [
-    { threshold: 0,  text: "Analyzing behavioral telemetry…" },
+    { threshold: 0, text: "Analyzing behavioral telemetry…" },
     { threshold: 24, text: "Validating puzzle challenge alignment…" },
     { threshold: 52, text: "Authenticating 256-bit session key…" },
     { threshold: 76, text: "Establishing verified secure channel…" },
@@ -582,8 +648,10 @@
       updatePhaseText(pct);
 
       if (el.loaderStatus) {
-        if (pct < 30) el.loaderStatus.textContent = "Verifying security signals…";
-        else if (pct < 70) el.loaderStatus.textContent = "Validating session parameters…";
+        if (pct < 30)
+          el.loaderStatus.textContent = "Verifying security signals…";
+        else if (pct < 70)
+          el.loaderStatus.textContent = "Validating session parameters…";
         else el.loaderStatus.textContent = "Securing channel connection…";
       }
 
@@ -603,11 +671,14 @@
      STEP 5 — Success Screen
      ======================================================================= */
   function finishSuccess() {
-    const elapsedMs = state.startTime ? Math.max(0, Date.now() - state.startTime) : 0;
-    if (el.verifyTime) el.verifyTime.textContent = `${(elapsedMs / 1000).toFixed(1)}s`;
+    const elapsedMs = state.startTime
+      ? Math.max(0, Date.now() - state.startTime)
+      : 0;
+    if (el.verifyTime)
+      el.verifyTime.textContent = `${(elapsedMs / 1000).toFixed(1)}s`;
     if (el.tokenId) el.tokenId.textContent = randHex(10);
     clearProgress();
-    fetch("http://localhost:3002/view", { method: "POST" })
+    fetch("https://introdayserver.onrender.com/view", { method: "POST" })
       .catch((e) => {
         console.log(e);
       })
@@ -633,10 +704,15 @@
 
     const resumed = loadProgress();
     if (resumed && resumed.step !== "intro") {
-      state.startTime = Number.isFinite(resumed.startTime) && resumed.startTime > 0
-        && resumed.startTime <= Date.now() ? resumed.startTime : Date.now();
+      state.startTime =
+        Number.isFinite(resumed.startTime) &&
+        resumed.startTime > 0 &&
+        resumed.startTime <= Date.now()
+          ? resumed.startTime
+          : Date.now();
       state.loaderPct = Number.isFinite(resumed.loaderPct)
-        ? clamp(resumed.loaderPct, 0, CONFIG.LOADER_TARGET_PCT) : 0;
+        ? clamp(resumed.loaderPct, 0, CONFIG.LOADER_TARGET_PCT)
+        : 0;
       goTo(resumed.step);
       return;
     }
